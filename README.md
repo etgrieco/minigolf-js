@@ -25,6 +25,8 @@ The project will also include:
 
 This app will use a simple GUI in order to display important information for gameplay, including score (relative to par), the power level of shots, and a visual indicator for player's intended shot path.
 
+![Wireframe](https://raw.githubusercontent.com/etgrieco/minigolf-js/master/docs/images/wireframe.png)
+
 The color scheme of the game should clearly indicate the presence of the ball, hole, and obstacles.
 
 ### Technologies
