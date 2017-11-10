@@ -69,7 +69,7 @@
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_game_view__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_game_view__ = __webpack_require__(1);
 // import Ball from './lib/ball';
 
 
@@ -83,109 +83,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 /***/ }),
-/* 1 */,
-/* 2 */
+/* 1 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-class Ball {
-
-  constructor({ pos, vel, radius, color }) {
-    this.pos = pos;
-    this.vel = vel;
-    this.radius = radius;
-    this.color = color;
-  }
-
-  draw(ctx) {
-    ctx.beginPath();
-    ctx.arc(this.pos[0], this.pos[1], this.radius, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.stroke();
-  }
-
-  move() {
-    const x = this.pos[0] + this.vel[0];
-    const y = this.pos[1] + this.vel[1];
-
-    this.pos = [x, y];
-  }
-
-  calcVelocity(theta) {
-    const velX = 5 * Math.cos(theta);
-    const velY = 5 * Math.sin(theta);
-
-    return [velX, velY];
-  }
-
-}
-
-/* harmony default export */ __webpack_exports__["a"] = (Ball);
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ball__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__putter__ = __webpack_require__(5);
-
-
-
-class Game {
-  constructor({ ctx, level }) {
-    this.level = level;
-    this.gameObjects = [];
-    this.draw(ctx);
-  }
-
-  addBall() {
-    const ball = new __WEBPACK_IMPORTED_MODULE_0__ball__["a" /* default */]({
-      pos: this.level.ballStartPos,
-      vel: [0, 0],
-      radius: 5,
-      color: null,
-    });
-
-    this.gameObjects.push(ball);
-    return ball;
-  }
-
-  addPutter() {
-    const putter = new __WEBPACK_IMPORTED_MODULE_1__putter__["a" /* default */]({
-      theta: 0,
-      thetaDirection: 1,
-      pos: this.level.ballStartPos
-    });
-
-    this.gameObjects.push(putter);
-    return putter;
-  }
-
-  draw(ctx) {
-    ctx.clearRect(0, 0, Game.DIM_X, Game.DIM_Y);
-    this.gameObjects.forEach( (obj) => obj.draw(ctx));
-  }
-
-  moveObjects() {
-    this.gameObjects.forEach( (obj) => obj.move());
-  }
-
-}
-
-Game.DIM_X = 640;
-Game.DIM_Y = 480;
-
-/* harmony default export */ __webpack_exports__["a"] = (Game);
-
-
-/***/ }),
-/* 4 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(2);
 
 
 const placeHolderLevel = { ballStartPos: [100, 100]};
@@ -260,7 +162,104 @@ class GameView {
 
 
 /***/ }),
-/* 5 */
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ball__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__putter__ = __webpack_require__(4);
+
+
+
+class Game {
+  constructor({ ctx, level }) {
+    this.level = level;
+    this.gameObjects = [];
+    this.draw(ctx);
+  }
+
+  addBall() {
+    const ball = new __WEBPACK_IMPORTED_MODULE_0__ball__["a" /* default */]({
+      pos: this.level.ballStartPos,
+      vel: [0, 0],
+      radius: 5,
+      color: null,
+    });
+
+    this.gameObjects.push(ball);
+    return ball;
+  }
+
+  addPutter() {
+    const putter = new __WEBPACK_IMPORTED_MODULE_1__putter__["a" /* default */]({
+      theta: 0,
+      thetaDirection: 1,
+      pos: this.level.ballStartPos
+    });
+
+    this.gameObjects.push(putter);
+    return putter;
+  }
+
+  draw(ctx) {
+    ctx.clearRect(0, 0, Game.DIM_X, Game.DIM_Y);
+    this.gameObjects.forEach( (obj) => obj.draw(ctx));
+  }
+
+  moveObjects() {
+    this.gameObjects.forEach( (obj) => obj.move());
+  }
+
+}
+
+Game.DIM_X = 640;
+Game.DIM_Y = 480;
+
+/* harmony default export */ __webpack_exports__["a"] = (Game);
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+class Ball {
+
+  constructor({ pos, vel, radius, color }) {
+    this.pos = pos;
+    this.vel = vel;
+    this.radius = radius;
+    this.color = color;
+  }
+
+  draw(ctx) {
+    ctx.beginPath();
+    ctx.arc(this.pos[0], this.pos[1], this.radius, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  move() {
+    const x = this.pos[0] + this.vel[0];
+    const y = this.pos[1] + this.vel[1];
+
+    this.pos = [x, y];
+  }
+
+  calcVelocity(theta) {
+    const velX = 5 * Math.cos(theta);
+    const velY = 5 * Math.sin(theta);
+
+    return [velX, velY];
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (Ball);
+
+
+/***/ }),
+/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
