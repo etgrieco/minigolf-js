@@ -501,8 +501,10 @@ class Wall extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */]
 
 
 const walls = [
-  new __WEBPACK_IMPORTED_MODULE_1__wall__["a" /* default */]([200, 200, 40, 40]),
-  new __WEBPACK_IMPORTED_MODULE_1__wall__["a" /* default */]([20, 20, 40, 40])
+  new __WEBPACK_IMPORTED_MODULE_1__wall__["a" /* default */]([200, 150, 40, 40]),
+  new __WEBPACK_IMPORTED_MODULE_1__wall__["a" /* default */]([400, 300, 40, 40]),
+  new __WEBPACK_IMPORTED_MODULE_1__wall__["a" /* default */]([400, 150, 40, 40]),
+  new __WEBPACK_IMPORTED_MODULE_1__wall__["a" /* default */]([200, 300, 40, 40])
 ];
 
 const level1 = new __WEBPACK_IMPORTED_MODULE_0__level__["a" /* default */] ({
