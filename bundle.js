@@ -65,9 +65,233 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-throw new Error("Module build failed: Error: ENOENT: no such file or directory, open '/Users/Elliott/Documents/etgrieco/minigolf-js/minigolf.js'\n    at Error (native)");
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_game_view__ = __webpack_require__(4);
+// import Ball from './lib/ball';
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const canvas = document.querySelector('canvas');
+  const ctx = canvas.getContext('2d');
+
+  new __WEBPACK_IMPORTED_MODULE_0__lib_game_view__["a" /* default */](ctx);
+});
+
+
+/***/ }),
+/* 1 */,
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+class Ball {
+
+  constructor({ pos, vel, radius, color }) {
+    this.pos = pos;
+    this.vel = vel;
+    this.radius = radius;
+    this.color = color;
+  }
+
+  draw(ctx) {
+    ctx.beginPath();
+    ctx.arc(this.pos[0], this.pos[1], this.radius, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  move() {
+    const x = this.pos[0] + this.vel[0];
+    const y = this.pos[1] + this.vel[1];
+
+    this.pos = [x, y];
+  }
+
+  calcVelocity(theta) {
+    const velX = 5 * Math.cos(theta);
+    const velY = 5 * Math.sin(theta);
+
+    return [velX, velY];
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (Ball);
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ball__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__putter__ = __webpack_require__(5);
+
+
+
+class Game {
+  constructor({ ctx, level }) {
+    this.level = level;
+    this.gameObjects = [];
+    this.draw(ctx);
+  }
+
+  addBall() {
+    const ball = new __WEBPACK_IMPORTED_MODULE_0__ball__["a" /* default */]({
+      pos: this.level.ballStartPos,
+      vel: [0, 0],
+      radius: 5,
+      color: null,
+    });
+
+    this.gameObjects.push(ball);
+    return ball;
+  }
+
+  addPutter() {
+    const putter = new __WEBPACK_IMPORTED_MODULE_1__putter__["a" /* default */]({
+      theta: 0,
+      thetaDirection: 1,
+      pos: this.level.ballStartPos
+    });
+
+    this.gameObjects.push(putter);
+    return putter;
+  }
+
+  draw(ctx) {
+    ctx.clearRect(0, 0, Game.DIM_X, Game.DIM_Y);
+    this.gameObjects.forEach( (obj) => obj.draw(ctx));
+  }
+
+  moveObjects() {
+    this.gameObjects.forEach( (obj) => obj.move());
+  }
+
+}
+
+Game.DIM_X = 640;
+Game.DIM_Y = 480;
+
+/* harmony default export */ __webpack_exports__["a"] = (Game);
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(3);
+
+
+const placeHolderLevel = { ballStartPos: [100, 100]};
+
+class GameView {
+
+  constructor(ctx) {
+    this.ctx = ctx;
+    this.game = new __WEBPACK_IMPORTED_MODULE_0__game__["a" /* default */]({
+      level: placeHolderLevel,
+      ctx
+    });
+
+    this.putter = this.game.addPutter();
+    this.ball = this.game.addBall();
+    this.start();
+  }
+
+  start() {
+    this.bindKeyHandlers();
+    setInterval(() => {
+      this.game.moveObjects();
+      this.game.draw(this.ctx);
+    }, 1000 / 60 );
+  }
+
+  bindKeyHandlers() {
+    const putter = this.putter;
+    document.addEventListener("keydown",
+      e => {
+        this.changeTheta(e);
+        this.changeVelocity(e);
+      });
+  }
+
+  changeTheta(e) {
+    switch (e.key) {
+      case "s":
+      case "ArrowDown":
+        this.putter.theta += this.putter.thetaDirection * .017;
+        break;
+      case "w":
+      case "ArrowUp":
+        this.putter.theta -= this.putter.thetaDirection * .017;
+        break;
+      case "a":
+      case "ArrowLeft":
+        this.putter.theta = Math.PI;
+        this.putter.thetaDirection = -1;
+        break;
+      case "d":
+      case "ArrowRight":
+        this.putter.thetaDirection = 1;
+        this.putter.theta = 0;
+        break;
+      default:
+    }
+  }
+
+  changeVelocity(e) {
+    switch (e.key) {
+      case " ":
+        this.ball.vel = this.ball.calcVelocity(this.putter.theta);
+        break;
+      default:
+    }
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (GameView);
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+class Putter {
+
+  constructor({ theta, thetaDirection, pos}) {
+    this.theta = theta;
+    this.thetaDirection = thetaDirection;
+    this.pos = pos;
+  }
+
+  draw(ctx, e) {
+    const [x, y] = this.pos;
+
+    const lineX = 150 * Math.cos(this.theta) + y;
+    const lineY = 150 * Math.sin(this.theta) + x;
+
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(lineX, lineY);
+    ctx.stroke();
+  }
+
+  move() {
+
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (Putter);
+
 
 /***/ })
 /******/ ]);
