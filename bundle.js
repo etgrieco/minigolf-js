@@ -88,7 +88,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__level__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__levels_level_1__ = __webpack_require__(9);
+
+// import Level from './level';
+// import Wall from './wall';
 
 
 
@@ -97,7 +100,7 @@ class GameView {
   constructor(ctx) {
     this.ctx = ctx;
     this.game = new __WEBPACK_IMPORTED_MODULE_0__game__["a" /* default */]({
-      level: new __WEBPACK_IMPORTED_MODULE_1__level__["a" /* default */](),
+      level: __WEBPACK_IMPORTED_MODULE_1__levels_level_1__["a" /* default */],
       ctx
     });
 
@@ -110,9 +113,7 @@ class GameView {
     this.bindKeyHandlers();
     setInterval(() => {
       this.game.moveObjects();
-      
-      // this.game.checkHole();
-      // this.game.checkCanvas();
+      this.game.checkCollissions();
       this.game.draw(this.ctx);
     }, 1000 / 60 );
   }
@@ -214,18 +215,10 @@ class Game {
       key => this.gameObjects[key].move());
   }
 
-  checkHole() {
-    const { ball, level } = this.gameObjects;
-    if (ball.isCollidedwithHole(level)) {
-      ball.inHole = true;
-    }
-  }
-
-  checkCanvas() {
-    const { ball } = this.gameObjects;
-    if (ball.pos[0] > Game.DIM_X || ball.pos[1] > Game.DIM_Y) {
-      ball.isOutside = true;
-    }
+  checkCollissions() {
+    Object.keys(this.gameObjects).forEach(
+      key => this.gameObjects[key].checkCollissions(this.gameObjects)
+    );
   }
 
 }
@@ -254,11 +247,11 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     this.vel = vel;
     this.radius = radius;
     this.inHole = false;
-    this.isOutside = false;
+    this.inCanvas = true;
   }
 
   draw(ctx) {
-    if (!this.inHole && !this.isOutside) {
+    if (!this.inHole && this.inCanvas) {
       ctx.beginPath();
       ctx.arc(this.pos[0], this.pos[1], this.radius, 0, 2 * Math.PI);
       ctx.fill();
@@ -281,13 +274,30 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     return [velX, velY];
   }
 
-  isCollidedwithHole(level) {
+  checkCollissions(gameObjects) {
+    this.checkHole(gameObjects.level);
+    this.checkLevelBoundaries(gameObjects.level);
+  }
+
+  checkHole(level) {
     const { pos: holePos, radius: holeRadius } = level.hole;
 
     const { pos, radius } = this;
     const minimumDistance = holeRadius + radius;
 
-    return __WEBPACK_IMPORTED_MODULE_0__physics__["a" /* default */].dist(pos, holePos) < minimumDistance;
+    if (__WEBPACK_IMPORTED_MODULE_0__physics__["a" /* default */].dist(pos, holePos) < minimumDistance){
+      this.inHole = true;
+    }
+  }
+
+  checkLevelBoundaries(level) {
+      const { height, width } = level;
+      if (this.pos[0] > width   ||
+          this.pos[1] > height  ||
+          this.pos[0] < 0       ||
+          this.pos[1] < 0)          {
+        this.inCanvas = false;
+      }
   }
 
 }
@@ -341,15 +351,15 @@ class Putter extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default *
 
 class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */] {
 
-  constructor(walls) {
+  constructor(props) {
     super();
+    Object.assign(this, props);
+
     this.ballStartPos = [100, 100];
     this.hole = {
       pos: [640 * Math.random(), 480 * Math.random()],
       radius: 10
     };
-    this.walls = [new __WEBPACK_IMPORTED_MODULE_1__wall__["a" /* default */]([200,200,150,100])];
-    // this.walls = walls;
   }
 
   draw(ctx) {
@@ -413,6 +423,10 @@ class GameObject {
   move(ctx) {
 
   }
+
+  checkCollissions() {
+    
+  }
 }
 
 /* harmony default export */ __webpack_exports__["a"] = (GameObject);
@@ -441,6 +455,25 @@ class Wall extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */]
 }
 
 /* harmony default export */ __webpack_exports__["a"] = (Wall);
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__level__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__wall__ = __webpack_require__(8);
+
+
+
+const level1 = new __WEBPACK_IMPORTED_MODULE_0__level__["a" /* default */] ({
+  walls: [new __WEBPACK_IMPORTED_MODULE_1__wall__["a" /* default */]([200,200,150,100])],
+  height: 640,
+  width: 480
+});
+
+/* harmony default export */ __webpack_exports__["a"] = (level1);
 
 
 /***/ })
