@@ -136,16 +136,8 @@ class Ball {
 class Game {
   constructor({ ctx, level }) {
     this.level = level;
-    this.setWindow();
     this.gameObjects = [];
     this.draw(ctx);
-  }
-
-  setWindow() {
-    this.DIM_X = 480;
-    this.DIM_Y = 640;
-    Object.freeze(this.DIM_X);
-    Object.freeze(this.DIM_Y);
   }
 
   addBall() {
@@ -172,7 +164,7 @@ class Game {
   }
 
   draw(ctx) {
-    ctx.clearRect(0, 0, this.DIM_X, this.DIM_Y);
+    ctx.clearRect(0, 0, Game.DIM_X, Game.DIM_Y);
     this.gameObjects.forEach( (obj) => obj.draw(ctx));
   }
 
@@ -180,9 +172,10 @@ class Game {
     this.gameObjects.forEach( (obj) => obj.move());
   }
 
-
 }
 
+Game.DIM_X = 640;
+Game.DIM_Y = 480;
 
 /* harmony default export */ __webpack_exports__["a"] = (Game);
 
