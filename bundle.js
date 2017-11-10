@@ -90,8 +90,6 @@ document.addEventListener("DOMContentLoaded", () => {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__levels_level_1__ = __webpack_require__(9);
 
-// import Level from './level';
-// import Wall from './wall';
 
 
 
@@ -154,7 +152,7 @@ class GameView {
   changeVelocity(e) {
     switch (e.key) {
       case " ":
-        this.ball.vel = this.ball.calcVelocity(this.putter.theta);
+        this.ball.hit(this.putter.theta);
         break;
       default:
     }
@@ -246,37 +244,46 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     this.pos = pos;
     this.vel = vel;
     this.radius = radius;
-    this.inHole = false;
-    this.inCanvas = true;
+    this.inObstacle = false;
+    this.accel = [-.1, -.1];
   }
 
   draw(ctx) {
-    if (!this.inHole && this.inCanvas) {
+    if (!this.inObstacle) {
       ctx.beginPath();
       ctx.arc(this.pos[0], this.pos[1], this.radius, 0, 2 * Math.PI);
       ctx.fill();
       ctx.stroke();
     }
-
   }
 
   move() {
-    const x = this.pos[0] + this.vel[0];
-    const y = this.pos[1] + this.vel[1];
+    let [vx, vy] = this.vel;
+    if (vx !== 0 || vy !== 0) {
+      [vx, vy] = [vx / 1.02, vy / 1.02];
+      if (vx < .1 && vy < .1) {
+        [vx, vy] = [Math.floor(vx), Math.floor(vy)];
+      }
+      this.vel = [vx, vy];
+    }
 
+    //calculate new position
+    const x = this.pos[0] + vx;
+    const y = this.pos[1] + vy;
     this.pos = [x, y];
   }
 
-  calcVelocity(theta) {
-    const velX = 5 * Math.cos(theta);
-    const velY = 5 * Math.sin(theta);
+  hit(theta, vel = 5) {
+    const velX = vel * Math.cos(theta);
+    const velY = vel * Math.sin(theta);
 
-    return [velX, velY];
+    this.vel = [velX, velY];
   }
 
   checkCollissions(gameObjects) {
     this.checkHole(gameObjects.level);
     this.checkLevelBoundaries(gameObjects.level);
+    this.checkWalls(gameObjects.level);
   }
 
   checkHole(level) {
@@ -286,7 +293,7 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     const minimumDistance = holeRadius + radius;
 
     if (__WEBPACK_IMPORTED_MODULE_0__physics__["a" /* default */].dist(pos, holePos) < minimumDistance){
-      this.inHole = true;
+      this.inObstacle = true;
     }
   }
 
@@ -297,7 +304,22 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
         y > height  ||
         x < 0       ||
         y < 0        ) {
-      this.inCanvas = false;
+      this.inObstacle = true;
+    }
+  }
+
+  checkWalls(level) {
+    const [x, y] = this.pos;
+    for (let i = 0; i < level.walls.length; i++) {
+      let wall = level.walls[i];
+      let [x1, y1, width, height] = wall.dimensions;
+
+      let x2 = width + x1
+      let y2 = height + y1;
+
+      if ((y > y1 && y < y2) && (x > x1 && x < x2)) {
+        this.inObstacle = true;
+      }
     }
   }
 
