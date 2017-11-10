@@ -345,8 +345,6 @@ class Putter extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default *
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_object__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__wall__ = __webpack_require__(8);
-
 
 
 class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */] {
@@ -354,12 +352,6 @@ class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */
   constructor(props) {
     super();
     Object.assign(this, props);
-
-    this.ballStartPos = [100, 100];
-    this.hole = {
-      pos: [640 * Math.random(), 480 * Math.random()],
-      radius: 10
-    };
   }
 
   draw(ctx) {
@@ -469,8 +461,13 @@ class Wall extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */]
 
 const level1 = new __WEBPACK_IMPORTED_MODULE_0__level__["a" /* default */] ({
   walls: [new __WEBPACK_IMPORTED_MODULE_1__wall__["a" /* default */]([200,200,150,100])],
-  height: 640,
-  width: 480
+  height: 480,
+  width: 640,
+  ballStartPos: [100, 100],
+  hole: {
+    pos: [640 * Math.random(), 480 * Math.random()],
+    radius: 10
+  }
 });
 
 /* harmony default export */ __webpack_exports__["a"] = (level1);
