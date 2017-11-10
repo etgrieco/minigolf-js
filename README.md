@@ -15,7 +15,7 @@ This minigolf game will be able to:
 - [ ] Incorporate a skill-based element for the power meter that will force the player to properly time their inputs to adjust for shot power appropriately
 - [ ] A consistent physics model that allows shots to be relatively predictable
 - [ ] Include a set number (3 - 5) of pleasing level designs of increasing difficulty
-- [ ] Utilize pleasing graphics to represent a real-world visual approximation of the actual hobby, to draw players in.
+- [ ] Utilize pleasing graphics to represent a real-world visual approximation of the actual game, to draw players in.
 
 The project will also include:
 - [ ] An About modal describing the background and rules of the game
@@ -31,29 +31,30 @@ The color scheme of the game should clearly indicate the presence of the ball, h
 
 ### Technologies
 `JavaScript` for game logic
-`Matter.js` for the [physics engine](https://github.com/liabru/matter-js)
-`Browserfy` for bundling the js files
+`HTML Canvas` for rendering of gamespace.
+`Webpack` for bundling the js files
 
 The primary scripts that will hold the game-logic will be broken up into: 
 
-`physics.js`: this will handle the general game logic for golfing action, including ball motion physics, collision, and ricochet behaviors, and hole-detection.
+`{game_object}.js`: These files how different game objects (ball, hole, walls, etc.) will interact with the physics engine in the former file. All game objects will inherit from `GameObjects`, to keep the code DRY and simplify rendering methods.
 
-`materials.js`: this will handle how different game materials (ball, hole, obstacles, etc.) will interact with the physics engine in the former file.
+`physics.js`: This will handle the majority of important physics calculations, such as collision-detection.
 
-`ui.js`: this will handle the game ui, including user input, and allows all of the game logic to work together to get a basically functioning golf game going. This should also include the basic sounds needed for an immersive game experience.
+`level_{x}.js`: Once the general game logic works, level objects can build the game world, with properties that designate the placement and attributes of the available `game_objects`.
 
-`levels.js`: once the general game logic works, levels utilizing `materials` will need to be created.
+`game.js`: This file combines the various game objects into a single API. It is responsible for the master `draw` and `move` functions, which calls the corresponding `draw`/`move` functions of all the game objects, populated by a level design, it contains.
+
+`game_view.js`: Handles user input and the HTML canvas context. This should also include the basic sounds needed for an immersive game experience.
 
 ### Implementation Timelinez
 
-**Day 1:** Setup all necessary modules and the general packaging setup, including `Matter.js`. Write an entry file that can load `Matter.js` and other dependencies into the browser easily. Learn the basics of `Matter.js` and choose the specific tools that would be best for my project. Draft 3-5 basic level designs.
+**Day 1:** Write an entry file that can load an object oriented library of javascript files utilizing ES6 import/export functionality. Learn `Canvas` basics and choose the specific tools that would be best for my project. Draft 3-5 basic level designs.
 
 Goals:
 * Get a green entry-file/bundle working
-* Learn Materials.js basics and select tools
 * Level design rough drafts
 
-**Day 2:** Dedicate the day to learning `Matter.js` and getting a working physics prototype working. The model does not yet need to incorporate user-input, but the architecture should export this expandability easily.
+**Day 2:** Dedicate the day to getting a working physics prototype working. The model should be able to take simplified payer input to determine the angle of the shot, and a simple UI with basic `canvas` elements to demonstrate the physics model in practice.
 * Complete a working prototype of the golf physics model, including:
   * Variable initial-velocities
   * Consistent deceleration
