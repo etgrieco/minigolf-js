@@ -88,16 +88,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__level__ = __webpack_require__(5);
 
 
-const placeHolderLevel = { ballStartPos: [100, 100]};
 
 class GameView {
 
   constructor(ctx) {
     this.ctx = ctx;
     this.game = new __WEBPACK_IMPORTED_MODULE_0__game__["a" /* default */]({
-      level: placeHolderLevel,
+      level: new __WEBPACK_IMPORTED_MODULE_1__level__["a" /* default */](),
       ctx
     });
 
@@ -110,6 +110,9 @@ class GameView {
     this.bindKeyHandlers();
     setInterval(() => {
       this.game.moveObjects();
+      
+      // this.game.checkHole();
+      // this.game.checkCanvas();
       this.game.draw(this.ctx);
     }, 1000 / 60 );
   }
@@ -174,7 +177,7 @@ class GameView {
 class Game {
   constructor({ ctx, level }) {
     this.level = level;
-    this.gameObjects = [];
+    this.gameObjects = { level };
     this.draw(ctx);
   }
 
@@ -182,11 +185,10 @@ class Game {
     const ball = new __WEBPACK_IMPORTED_MODULE_0__ball__["a" /* default */]({
       pos: this.level.ballStartPos,
       vel: [0, 0],
-      radius: 5,
-      color: null,
+      radius: 5
     });
 
-    this.gameObjects.push(ball);
+    this.gameObjects.ball = ball;
     return ball;
   }
 
@@ -197,17 +199,33 @@ class Game {
       pos: this.level.ballStartPos
     });
 
-    this.gameObjects.push(putter);
+    this.gameObjects.putter = putter;
     return putter;
   }
 
   draw(ctx) {
     ctx.clearRect(0, 0, Game.DIM_X, Game.DIM_Y);
-    this.gameObjects.forEach( (obj) => obj.draw(ctx));
+    Object.keys(this.gameObjects).forEach(
+      key => this.gameObjects[key].draw(ctx));
   }
 
   moveObjects() {
-    this.gameObjects.forEach( (obj) => obj.move());
+    Object.keys(this.gameObjects).forEach(
+      key => this.gameObjects[key].move());
+  }
+
+  checkHole() {
+    const { ball, level } = this.gameObjects;
+    if (ball.isCollidedwithHole(level)) {
+      ball.inHole = true;
+    }
+  }
+
+  checkCanvas() {
+    const { ball } = this.gameObjects;
+    if (ball.pos[0] > Game.DIM_X || ball.pos[1] > Game.DIM_Y) {
+      ball.isOutside = true;
+    }
   }
 
 }
@@ -223,20 +241,30 @@ Game.DIM_Y = 480;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-class Ball {
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__physics__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_object__ = __webpack_require__(7);
 
-  constructor({ pos, vel, radius, color }) {
+
+
+class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */] {
+
+  constructor({ pos, vel, radius }) {
+    super();
     this.pos = pos;
     this.vel = vel;
     this.radius = radius;
-    this.color = color;
+    this.inHole = false;
+    this.isOutside = false;
   }
 
   draw(ctx) {
-    ctx.beginPath();
-    ctx.arc(this.pos[0], this.pos[1], this.radius, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.stroke();
+    if (!this.inHole && !this.isOutside) {
+      ctx.beginPath();
+      ctx.arc(this.pos[0], this.pos[1], this.radius, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.stroke();
+    }
+
   }
 
   move() {
@@ -253,6 +281,15 @@ class Ball {
     return [velX, velY];
   }
 
+  isCollidedwithHole(level) {
+    const { pos: holePos, radius: holeRadius } = level.hole;
+
+    const { pos, radius } = this;
+    const minimumDistance = holeRadius + radius;
+
+    return __WEBPACK_IMPORTED_MODULE_0__physics__["a" /* default */].dist(pos, holePos) < minimumDistance;
+  }
+
 }
 
 /* harmony default export */ __webpack_exports__["a"] = (Ball);
@@ -263,9 +300,13 @@ class Ball {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-class Putter {
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_object__ = __webpack_require__(7);
+
+
+class Putter extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */] {
 
   constructor({ theta, thetaDirection, pos}) {
+    super();
     this.theta = theta;
     this.thetaDirection = thetaDirection;
     this.pos = pos;
@@ -283,13 +324,123 @@ class Putter {
     ctx.stroke();
   }
 
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (Putter);
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_object__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__wall__ = __webpack_require__(8);
+
+
+
+class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */] {
+
+  constructor(walls) {
+    super();
+    this.ballStartPos = [100, 100];
+    this.hole = {
+      pos: [640 * Math.random(), 480 * Math.random()],
+      radius: 10
+    };
+    this.walls = [new __WEBPACK_IMPORTED_MODULE_1__wall__["a" /* default */]([200,200,150,100])];
+    // this.walls = walls;
+  }
+
+  draw(ctx) {
+    this.drawHole(ctx);
+    this.drawWalls(ctx);
+  }
+
+  drawHole(ctx) {
+    const { radius, pos } = this.hole;
+    const [x, y] = pos;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  drawWalls(ctx) {
+    this.walls.forEach((wall) => wall.draw(ctx));
+  }
+
   move() {
 
   }
 
 }
 
-/* harmony default export */ __webpack_exports__["a"] = (Putter);
+/* harmony default export */ __webpack_exports__["a"] = (Level);
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+const Physics = {
+
+  dist (pos1, pos2) {
+    const [x1, y1] = pos1;
+    const [x2, y2] = pos2;
+
+    return Math.sqrt(
+      Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)
+    );
+  }
+
+};
+
+/* harmony default export */ __webpack_exports__["a"] = (Physics);
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+class GameObject {
+  draw(ctx) {
+
+  }
+
+  move(ctx) {
+
+  }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (GameObject);
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_object__ = __webpack_require__(7);
+
+
+class Wall extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */] {
+
+  constructor(dimensions) {
+    super();
+    this.dimensions = dimensions; // array of dimensions
+  }
+
+  draw(ctx) {
+    ctx.rect(...this.dimensions);
+    ctx.stroke();
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (Wall);
 
 
 /***/ })
