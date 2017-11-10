@@ -511,7 +511,7 @@ const level1 = new __WEBPACK_IMPORTED_MODULE_0__level__["a" /* default */] ({
   walls,
   height: 480,
   width: 640,
-  ballStartPos: [320, 240],
+  ballStartPos: [230, 250],
   hole: {
     pos: [640 * Math.random(), 480 * Math.random()],
     radius: 10
