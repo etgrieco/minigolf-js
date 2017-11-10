@@ -291,13 +291,14 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
   }
 
   checkLevelBoundaries(level) {
-      const { height, width } = level;
-      if (this.pos[0] > width   ||
-          this.pos[1] > height  ||
-          this.pos[0] < 0       ||
-          this.pos[1] < 0)          {
-        this.inCanvas = false;
-      }
+    const [x, y] = this.pos;
+    const { height, width } = level;
+    if (x > width   ||
+        y > height  ||
+        x < 0       ||
+        y < 0        ) {
+      this.inCanvas = false;
+    }
   }
 
 }
@@ -459,8 +460,13 @@ class Wall extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */]
 
 
 
+const walls = [
+  new __WEBPACK_IMPORTED_MODULE_1__wall__["a" /* default */]([150, 150, 200, 200])
+];
+
+
 const level1 = new __WEBPACK_IMPORTED_MODULE_0__level__["a" /* default */] ({
-  walls: [new __WEBPACK_IMPORTED_MODULE_1__wall__["a" /* default */]([200,200,150,100])],
+  walls,
   height: 480,
   width: 640,
   ballStartPos: [100, 100],
