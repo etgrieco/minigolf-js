@@ -126,14 +126,15 @@ class GameView {
   }
 
   changeTheta(e) {
+    console.log(this.putter.theta);
     switch (e.key) {
       case "s":
       case "ArrowDown":
-        this.putter.theta += this.putter.thetaDirection * .017;
+        this.putter.theta += this.putter.thetaDirection * .2;
         break;
       case "w":
       case "ArrowUp":
-        this.putter.theta -= this.putter.thetaDirection * .017;
+        this.putter.theta -= this.putter.thetaDirection * .2;
         break;
       case "a":
       case "ArrowLeft":
@@ -191,14 +192,15 @@ class Game {
     return ball;
   }
 
-  addPutter() {
+  addPutter(pos = this.level.ballStartPos) {
     const putter = new __WEBPACK_IMPORTED_MODULE_1__putter__["a" /* default */]({
       theta: 0,
       thetaDirection: 1,
-      pos: this.level.ballStartPos
+      pos
     });
 
     this.gameObjects.putter = putter;
+    window.putter = putter;
     return putter;
   }
 
@@ -210,7 +212,7 @@ class Game {
 
   moveObjects() {
     Object.keys(this.gameObjects).forEach(
-      key => this.gameObjects[key].move());
+      key => this.gameObjects[key].move(this));
   }
 
   checkCollissions() {
@@ -245,26 +247,40 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     this.vel = vel;
     this.radius = radius;
     this.inObstacle = false;
-    this.accel = [-.1, -.1];
   }
 
   draw(ctx) {
-    if (!this.inObstacle) {
+    // if (!this.inObstacle) {
       ctx.beginPath();
       ctx.arc(this.pos[0], this.pos[1], this.radius, 0, 2 * Math.PI);
-      ctx.fill();
       ctx.stroke();
-    }
+    // }
   }
 
-  move() {
+  move(game) {
     let [vx, vy] = this.vel;
-    if (vx !== 0 || vy !== 0) {
-      [vx, vy] = [vx / 1.02, vy / 1.02];
-      if (vx < .1 && vy < .1) {
-        [vx, vy] = [Math.floor(vx), Math.floor(vy)];
+    if (!this.inObstacle) {
+      //calculate adjusted velocity
+      if (vx !== 0 || vy !== 0) {
+        [vx, vy] = [vx / 1.02, vy / 1.02];
+        if (Math.abs(vx) < .1 && Math.abs(vy) < .1) {
+          [vx, vy] = [0, 0];
+        }
+        this.vel = [vx, vy];
       }
-      this.vel = [vx, vy];
+    } // check ricochet direction
+    else {
+      const pos = [
+        (this.pos[0] - vx),
+        (this.pos[1])
+      ];
+
+      const testBall = new Ball({ pos });
+      testBall.checkWalls(game.level);
+
+      this.vel = testBall.inObstacle ?  [vx, -Math.abs(vy + .1)] : [-Math.abs(vx + .1), vy];
+
+      this.inObstacle = false;
     }
 
     //calculate new position
@@ -274,10 +290,10 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
   }
 
   hit(theta, vel = 5) {
-    const velX = vel * Math.cos(theta);
-    const velY = vel * Math.sin(theta);
+    const vx = vel * Math.cos(theta);
+    const vy = vel * Math.sin(theta);
 
-    this.vel = [velX, velY];
+    this.vel = [vx, vy];
   }
 
   checkCollissions(gameObjects) {
@@ -314,7 +330,7 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
       let wall = level.walls[i];
       let [x1, y1, width, height] = wall.dimensions;
 
-      let x2 = width + x1
+      let x2 = width + x1;
       let y2 = height + y1;
 
       if ((y > y1 && y < y2) && (x > x1 && x < x2)) {
@@ -322,7 +338,6 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
       }
     }
   }
-
 }
 
 /* harmony default export */ __webpack_exports__["a"] = (Ball);
@@ -347,14 +362,17 @@ class Putter extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default *
 
   draw(ctx, e) {
     const [x, y] = this.pos;
-
-    const lineX = 150 * Math.cos(this.theta) + y;
-    const lineY = 150 * Math.sin(this.theta) + x;
+    const lineY = 100 * Math.sin(this.theta) + y;
+    const lineX = 100 * Math.cos(this.theta) + x;
 
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(lineX, lineY);
     ctx.stroke();
+  }
+
+  move(game) {
+    
   }
 
 }
@@ -483,15 +501,15 @@ class Wall extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */]
 
 
 const walls = [
-  new __WEBPACK_IMPORTED_MODULE_1__wall__["a" /* default */]([150, 150, 200, 200])
+  new __WEBPACK_IMPORTED_MODULE_1__wall__["a" /* default */]([200, 200, 40, 40]),
+  new __WEBPACK_IMPORTED_MODULE_1__wall__["a" /* default */]([20, 20, 40, 40])
 ];
-
 
 const level1 = new __WEBPACK_IMPORTED_MODULE_0__level__["a" /* default */] ({
   walls,
   height: 480,
   width: 640,
-  ballStartPos: [100, 100],
+  ballStartPos: [320, 240],
   hole: {
     pos: [640 * Math.random(), 480 * Math.random()],
     radius: 10
