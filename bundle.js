@@ -237,16 +237,21 @@ class GameView {
     this.ball = this.game.addBall();
     this.putter = this.game.addPutter();
     this.bindKeyHandlers();
-    setInterval(() => {
-      this.checkHole(this.game);
-      this.game.moveObjects();
-      this.game.checkCollissions();
-      this.game.draw(this.ctx);
-      this.ui.draw(this.ctx);
-    }, 1000 / 60 );
+    this.lastTime = 0;
+    window.requestAnimationFrame(this.animate.bind(this));
   }
 
+  animate(time) {
+    this.checkHole(this.game);
 
+    const timeDelta = time - this.lastTime;
+    this.game.step(timeDelta);
+    this.game.draw(this.ctx);
+    this.ui.draw(this.ctx);
+    this.lastTime = time;
+
+    requestAnimationFrame(this.animate.bind(this));
+  }
 
   checkHole(game) {
     const { ball } = this.game.gameObjects;
@@ -376,6 +381,11 @@ class Game {
     this.strokes++;
   }
 
+  step(delta) {
+    this.checkCollissions();
+    this.moveObjects(delta);
+  }
+
 }
 
 Game.DIM_X = 640;
@@ -415,17 +425,17 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
   }
 
   move(game, delta) {
-    let [vx, vy] = this.vel;
-    if (this.inObstacle) {
-      this.ricochet(vx, vy, game.level);
-    }
-    [vx, vy] = this.vel;
-    this.decellerate(vx, vy);
+    if (this.isMoving) {
+      let [vx, vy] = this.vel;
+      if (this.inObstacle) {
+        this.ricochet(vx, vy, game.level, delta);
+      }
 
-    //calculate new position
-    const x = this.pos[0] + vx;
-    const y = this.pos[1] + vy;
-    this.pos = [x, y];
+      [vx, vy] = this.vel;
+      this.decellerate(vx, vy);
+      this.translate(vx, vy, delta);
+    }
+
   }
 
   decellerate(vx, vy) {
@@ -439,8 +449,15 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     }
   }
 
+  translate(vx, vy, delta) {
+    const x = this.pos[0] + vx * delta / Ball.DELTA_ADJUSTMENT;
+    const y = this.pos[1] + vy * delta / Ball.DELTA_ADJUSTMENT;
+    this.pos = [x, y];
+  }
+
   hit(putter) {
-    const { vel, theta } = putter;
+    let { vel, theta } = putter;
+    console.log(vel);
     const vx = vel / 8 * Math.cos(theta);
     const vy = vel / 8 * Math.sin(theta);
 
@@ -448,20 +465,16 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     this.isMoving = true;
   }
 
-  ricochet(vx, vy, level) {
+  ricochet(vx, vy, level, delta) {
     const pos = [
-      (this.pos[0] - vx),
+      (this.pos[0] - vx * delta / Ball.DELTA_ADJUSTMENT),
       this.pos[1]
     ];
 
     const testBall = new Ball({ pos });
     testBall.checkCollissions(level);
 
-    if (testBall.inObstacle) {
-      this.vel = [vx, -vy];
-    } else {
-      this.vel = [-vx, vy];
-    }
+    this.vel = testBall.inObstacle ? [vx, -vy] : [-vx, vy];
 
     this.inObstacle = false;
   }
@@ -512,6 +525,8 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     }
   }
 }
+
+Ball.DELTA_ADJUSTMENT = 10;
 
 /* harmony default export */ __webpack_exports__["a"] = (Ball);
 
@@ -578,8 +593,7 @@ class Putter extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default *
   }
 
   incrementVel() {
-    this.vel++;
-    this.vel = this.vel % 120;
+    this.vel = (this.vel + 1) % 120;
   }
 
 }
