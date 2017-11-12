@@ -250,11 +250,11 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
   }
 
   draw(ctx) {
-    // if (!this.inObstacle) {
+    if (!this.inObstacle) {
       ctx.beginPath();
       ctx.arc(this.pos[0], this.pos[1], this.radius, 0, 2 * Math.PI);
       ctx.stroke();
-    // }
+    }
   }
 
   move(game) {
@@ -268,24 +268,13 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
         }
         this.vel = [vx, vy];
       }
-    } // check ricochet direction
-    else {
-      const pos = [
-        (this.pos[0] - vx),
-        (this.pos[1])
-      ];
-
-      const testBall = new Ball({ pos });
-      testBall.checkWalls(game.level);
-
-      this.vel = testBall.inObstacle ?  [vx, -Math.abs(vy + .1)] : [-Math.abs(vx + .1), vy];
-
-      this.inObstacle = false;
+    } else { // check ricochet direction
+      this.checkRicochet(vx, vy, game);
     }
 
     //calculate new position
-    const x = this.pos[0] + vx;
-    const y = this.pos[1] + vy;
+    const x = this.pos[0] + this.vel[0];
+    const y = this.pos[1] + this.vel[1];
     this.pos = [x, y];
   }
 
@@ -294,6 +283,24 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     const vy = vel * Math.sin(theta);
 
     this.vel = [vx, vy];
+  }
+
+  checkRicochet(vx, vy, game) {
+    const pos = [
+      (this.pos[0] - vx),
+      (this.pos[1])
+    ];
+
+    const testBall = new Ball({ pos });
+    testBall.checkWalls(game.level);
+
+    if (testBall.inObstacle) {
+      this.vel = [vx, -vy];
+    } else {
+      this.vel = [-vx, vy];
+    }
+
+    this.inObstacle = false;
   }
 
   checkCollissions(gameObjects) {
@@ -511,7 +518,7 @@ const level1 = new __WEBPACK_IMPORTED_MODULE_0__level__["a" /* default */] ({
   walls,
   height: 480,
   width: 640,
-  ballStartPos: [230, 250],
+  ballStartPos: [320, 250],
   hole: {
     pos: [640 * Math.random(), 480 * Math.random()],
     radius: 10
