@@ -677,8 +677,8 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
 
 
 /* harmony default export */ __webpack_exports__["a"] = ([
-  // level1,
-  // level2,
+  __WEBPACK_IMPORTED_MODULE_0__level_1__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_1__level_2__["a" /* default */],
   __WEBPACK_IMPORTED_MODULE_2__level_3__["a" /* default */]
 ]);
 
@@ -696,7 +696,7 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
 const walls = [
 ];
 
-/* unused harmony default export */ var _unused_webpack_default_export = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
   height: 200,
   width: 600,
@@ -722,7 +722,7 @@ const walls = [
   new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([300, 180, 60, 140])
 ];
 
-/* unused harmony default export */ var _unused_webpack_default_export = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
   height: 200,
   width: 600,
