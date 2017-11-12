@@ -69,7 +69,7 @@
 
 "use strict";
 class GameObject {
-  draw(ctx) {
+  draw(ctx, game) {
 
   }
 
@@ -78,7 +78,7 @@ class GameObject {
   }
 
   checkCollissions() {
-    
+
   }
 }
 
@@ -358,7 +358,7 @@ class Game {
   draw(ctx) {
     ctx.clearRect(0, 0, Game.DIM_X, Game.DIM_Y);
     Object.keys(this.gameObjects).forEach(
-      key => this.gameObjects[key].draw(ctx));
+      key => this.gameObjects[key].draw(ctx, this));
   }
 
   moveObjects() {
@@ -551,15 +551,18 @@ class Putter extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default *
     this.pos = pos;
   }
 
-  draw(ctx, e) {
-    const [x, y] = this.pos;
-    const lineY = 100 * Math.sin(this.theta) + y;
-    const lineX = 100 * Math.cos(this.theta) + x;
+  draw(ctx, game) {
+    const ball = game.gameObjects.ball;
+    if(!ball.isMoving) {
+      const [x, y] = this.pos;
+      const lineY = 100 * Math.sin(this.theta) + y;
+      const lineX = 100 * Math.cos(this.theta) + x;
 
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(lineX, lineY);
-    ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(lineX, lineY);
+      ctx.stroke();
+    }
   }
 
   move(game) {
@@ -674,8 +677,9 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
 
 
 /* harmony default export */ __webpack_exports__["a"] = ([
-  __WEBPACK_IMPORTED_MODULE_0__level_1__["a" /* default */],
-  __WEBPACK_IMPORTED_MODULE_1__level_2__["a" /* default */]
+  // level1,
+  // level2,
+  __WEBPACK_IMPORTED_MODULE_2__level_3__["a" /* default */]
 ]);
 
 
@@ -692,7 +696,7 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
 const walls = [
 ];
 
-/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+/* unused harmony default export */ var _unused_webpack_default_export = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
   height: 200,
   width: 600,
@@ -718,7 +722,7 @@ const walls = [
   new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([300, 180, 60, 140])
 ];
 
-/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+/* unused harmony default export */ var _unused_webpack_default_export = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
   height: 200,
   width: 600,
@@ -741,19 +745,18 @@ const walls = [
 
 
 const walls = [
-  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([200, 150, 40, 40]),
-  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([400, 300, 40, 40]),
-  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([400, 150, 40, 40]),
-  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([200, 300, 40, 40])
+  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([160, 140, 30, 140]),
+  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([300, 200, 30, 140]),
+  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([440, 140, 30, 140]),
 ];
 
-/* unused harmony default export */ var _unused_webpack_default_export = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
   height: 200,
   width: 600,
-  ballStartPos: [20, 20],
+  ballStartPos: [35, 250],
   hole: {
-    pos: [320, 260],
+    pos: [550, 250],
     radius: 10
   }
 }));
