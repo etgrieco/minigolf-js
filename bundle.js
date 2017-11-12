@@ -112,6 +112,7 @@ class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */
 
   drawWalls(ctx) {
     this.walls.forEach((wall) => wall.draw(ctx));
+    ctx.stroke();
   }
 
   drawBoundaries(ctx) {
@@ -143,7 +144,6 @@ class Wall extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */]
 
   draw(ctx) {
     ctx.rect(...this.dimensions);
-    ctx.stroke();
   }
 
 }
@@ -267,19 +267,23 @@ class GameView {
 
     switch (e.key) {
       case "s":
+      case "S":
       case "ArrowDown":
         this.putter.theta += this.putter.thetaDirection * .2 * modifier;
         break;
       case "w":
+      case "W":
       case "ArrowUp":
         this.putter.theta -= this.putter.thetaDirection * .2 * modifier;
         break;
       case "a":
+      case "A":
       case "ArrowLeft":
         this.putter.theta = Math.PI;
         this.putter.thetaDirection = -1;
         break;
       case "d":
+      case "D":
       case "ArrowRight":
         this.putter.thetaDirection = 1;
         this.putter.theta = 0;
@@ -483,7 +487,7 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     const { pos, radius } = this;
     const minimumDistance = holeRadius + radius;
 
-    if (__WEBPACK_IMPORTED_MODULE_0__physics__["a" /* default */].dist(pos, holePos) <= minimumDistance){
+    if (__WEBPACK_IMPORTED_MODULE_0__physics__["a" /* default */].dist(pos, holePos) < minimumDistance){
       this.inHole = true;
     }
   }
@@ -497,7 +501,7 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     const x2 = width + x1;
     const y2 = height + y1;
 
-    if (y < y1 || y > y2 || x < x1 || x > x2) {
+    if (y <= y1 || y >= y2 || x <= x1 || x >= x2) {
       this.inObstacle = true;
     }
   }
@@ -511,7 +515,7 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
       let x2 = width + x1;
       let y2 = height + y1;
 
-      if ((y > y1 && y < y2) && (x > x1 && x < x2)) {
+      if ((y >= y1 && y <= y2) && (x >= x1 && x <= x2)) {
         this.inObstacle = true;
       }
     }
@@ -698,8 +702,8 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
 
 
 /* harmony default export */ __webpack_exports__["a"] = ([
-  __WEBPACK_IMPORTED_MODULE_0__level_1__["a" /* default */],
-  __WEBPACK_IMPORTED_MODULE_1__level_2__["a" /* default */],
+  // level1,
+  // level2,
   __WEBPACK_IMPORTED_MODULE_2__level_3__["a" /* default */]
 ]);
 
@@ -724,7 +728,7 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   radius: 10
 });
 
-/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+/* unused harmony default export */ var _unused_webpack_default_export = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
   height: 200,
   width: 600,
@@ -740,6 +744,8 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_level__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_wall__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__game_hole__ = __webpack_require__(18);
+
 
 
 
@@ -747,15 +753,17 @@ const walls = [
   new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([300, 180, 60, 140])
 ];
 
-/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
+  pos: [550, 250],
+  radius: 10
+});
+
+/* unused harmony default export */ var _unused_webpack_default_export = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
   height: 200,
   width: 600,
   ballStartPos: [35, 250],
-  hole: {
-    pos: [550, 250],
-    radius: 10
-  }
+  hole
 }));
 
 
@@ -766,6 +774,9 @@ const walls = [
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_level__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_wall__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__game_hole__ = __webpack_require__(18);
+
+
 
 
 
@@ -775,15 +786,17 @@ const walls = [
   new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([440, 140, 30, 140]),
 ];
 
+const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
+  pos: [550, 250],
+  radius: 10
+});
+
 /* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
   height: 200,
   width: 600,
   ballStartPos: [35, 250],
-  hole: {
-    pos: [550, 250],
-    radius: 10
-  }
+  hole
 }));
 
 
@@ -835,10 +848,31 @@ class Hole extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */]
 
   draw(ctx) {
     const { radius, pos } = this;
-    const [x, y] = pos;
-    ctx.beginPath();
-    ctx.arc(x, y, radius, 0, 2 * Math.PI);
-    ctx.fill();
+    const [dx, dy] = pos;
+
+    const img = new Image();
+    img.src = "./sprites/hole.png";
+
+    // test position
+    // ctx.beginPath();
+    // ctx.arc(dx, dy, radius, 0, 2 * Math.PI);
+    // ctx.fill();
+    // ctx.stroke();
+
+    // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+    const slice = {
+      img,
+      sx: 0,
+      sy: 0,
+      sWidth: 64,
+      sHeight: 64,
+      dx: dx - this.radius * 3,
+      dy: dy - this.radius * 4,
+      dWidth: 64,
+      dHeight: 64
+    };
+
+    ctx.drawImage(...Object.values(slice));
   }
 
 }
