@@ -315,7 +315,7 @@ class GameView {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ball__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__putter__ = __webpack_require__(9);
-  
+
 
 
 class Game {
@@ -359,19 +359,17 @@ class Game {
 
   draw(ctx) {
     ctx.clearRect(0, 0, Game.DIM_X, Game.DIM_Y);
-    Object.keys(this.gameObjects).forEach(
-      key => this.gameObjects[key].draw(ctx, this));
+    Object.values(this.gameObjects).forEach(
+      (obj) => obj.draw(ctx, this)
+    );
   }
 
   moveObjects() {
-    Object.keys(this.gameObjects).forEach(
-      key => this.gameObjects[key].move(this));
+    Object.values(this.gameObjects).forEach(
+      (obj) => obj.move(this));
   }
 
   checkCollissions() {
-    // Object.keys(this.gameObjects).forEach(
-    //   key => this.gameObjects[key].checkCollissions(this.level)
-    // );
     this.gameObjects.ball.checkCollissions(this.level);
   }
 
@@ -439,9 +437,10 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     this.pos = [x, y];
   }
 
-  hit(putter, vel = 5) {
-    const vx = vel * Math.cos(putter.theta);
-    const vy = vel * Math.sin(putter.theta);
+  hit(putter) {
+    const { vel, theta } = putter;
+    const vx = vel / 8 * Math.cos(theta);
+    const vy = vel / 8 * Math.sin(theta);
 
     this.vel = [vx, vy];
     this.isMoving = true;
@@ -450,7 +449,7 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
   checkRicochet(vx, vy, level) {
     const pos = [
       (this.pos[0] - vx),
-      (this.pos[1])
+      this.pos[1]
     ];
 
     const testBall = new Ball({ pos });
@@ -551,6 +550,7 @@ class Putter extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default *
     this.theta = theta;
     this.thetaDirection = thetaDirection;
     this.pos = pos;
+    this.vel = 0;
   }
 
   draw(ctx, game) {
@@ -570,8 +570,14 @@ class Putter extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default *
   move(game) {
     const ball = game.gameObjects.ball;
     if (!ball.isMoving) {
+      this.incrementVel();
       this.pos = game.gameObjects.ball.pos;
     }
+  }
+
+  incrementVel() {
+    this.vel++;
+    this.vel = this.vel % 120;
   }
 
 }
@@ -586,6 +592,8 @@ class Putter extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default *
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__stroke_counter__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__score_counter__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__power_meter__ = __webpack_require__(17);
+
 
 
 
@@ -594,9 +602,11 @@ class UI {
   constructor(game) {
     const strokes = new __WEBPACK_IMPORTED_MODULE_0__stroke_counter__["a" /* default */](game);
     const score = new __WEBPACK_IMPORTED_MODULE_1__score_counter__["a" /* default */](game);
+    const power = new __WEBPACK_IMPORTED_MODULE_2__power_meter__["a" /* default */](game);
     this.uiObjects = {
       strokes,
-      score
+      score,
+      power
     };
   }
 
@@ -607,7 +617,8 @@ class UI {
   advanceLevel(game) {
     this.uiObjects.score.addScore();
     const strokes = new __WEBPACK_IMPORTED_MODULE_0__stroke_counter__["a" /* default */](game);
-    Object.assign(this.uiObjects, {strokes});
+    const power = new __WEBPACK_IMPORTED_MODULE_2__power_meter__["a" /* default */](game);
+    Object.assign(this.uiObjects, {strokes, power});
   }
 
 }
@@ -762,6 +773,38 @@ const walls = [
     radius: 10
   }
 }));
+
+
+/***/ }),
+/* 17 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ui_object__ = __webpack_require__(3);
+
+
+class PowerMeter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* default */] {
+
+  draw(ctx) {
+    ctx.font = "30px Arial";
+    ctx.textAlign = "left";
+    ctx.fillText("Power:", 400, 460);
+
+    //power exterior
+    ctx.rect(500, 435, 120, 30);
+    ctx.stroke();
+
+    //power interior
+    const putter = this.game.gameObjects.putter;
+    const fill = putter.vel;
+
+    ctx.rect(500, 435, fill, 30);
+    ctx.stroke();
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (PowerMeter);
 
 
 /***/ })
