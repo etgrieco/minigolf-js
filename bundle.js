@@ -267,14 +267,16 @@ class GameView {
   }
 
   changeTheta(e) {
+    const modifier = e.shiftKey ? .3 : 1;
+    
     switch (e.key) {
       case "s":
       case "ArrowDown":
-        this.putter.theta += this.putter.thetaDirection * .2;
+        this.putter.theta += this.putter.thetaDirection * .2 * modifier;
         break;
       case "w":
       case "ArrowUp":
-        this.putter.theta -= this.putter.thetaDirection * .2;
+        this.putter.theta -= this.putter.thetaDirection * .2 * modifier;
         break;
       case "a":
       case "ArrowLeft":
