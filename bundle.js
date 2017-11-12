@@ -90,26 +90,6 @@ class GameObject {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-class UIObject {
-
-  constructor(game) {
-    this.game = game;
-  }
-
-  draw() {
-
-  }
-
-}
-
-/* harmony default export */ __webpack_exports__["a"] = (UIObject);
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_object__ = __webpack_require__(0);
 
 
@@ -121,6 +101,7 @@ class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */
   }
 
   draw(ctx) {
+    this.drawBoundaries(ctx);
     this.drawHole(ctx);
     this.drawWalls(ctx);
   }
@@ -138,6 +119,13 @@ class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */
     this.walls.forEach((wall) => wall.draw(ctx));
   }
 
+  drawBoundaries(ctx) {
+    const x =  (640 - this.width) / 2;
+    const y = (480 - this.height) / 2;
+    ctx.rect(x, y, this.width, this.height);
+    ctx.stroke();
+  }
+
   move() {
 
   }
@@ -148,7 +136,7 @@ class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */
 
 
 /***/ }),
-/* 3 */
+/* 2 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -170,6 +158,26 @@ class Wall extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */]
 }
 
 /* harmony default export */ __webpack_exports__["a"] = (Wall);
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+class UIObject {
+
+  constructor(game) {
+    this.game = game;
+  }
+
+  draw() {
+
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (UIObject);
 
 
 /***/ }),
@@ -359,9 +367,10 @@ class Game {
   }
 
   checkCollissions() {
-    Object.keys(this.gameObjects).forEach(
-      key => this.gameObjects[key].checkCollissions(this.gameObjects)
-    );
+    // Object.keys(this.gameObjects).forEach(
+    //   key => this.gameObjects[key].checkCollissions(this.level)
+    // );
+    this.gameObjects.ball.checkCollissions(this.level);
   }
 
   addStroke() {
@@ -399,7 +408,7 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
   }
 
   draw(ctx) {
-    if (!(this.inObstacle || this.inHole)) {
+    if (!this.inHole) {
       ctx.beginPath();
       ctx.arc(this.pos[0], this.pos[1], this.radius, 0, 2 * Math.PI);
       ctx.stroke();
@@ -419,7 +428,7 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
         this.vel = [vx, vy];
       }
     } else { // check ricochet direction
-      this.checkRicochet(vx, vy, game);
+      this.checkRicochet(vx, vy, game.level);
     }
 
     //calculate new position
@@ -436,14 +445,14 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     this.isMoving = true;
   }
 
-  checkRicochet(vx, vy, game) {
+  checkRicochet(vx, vy, level) {
     const pos = [
       (this.pos[0] - vx),
       (this.pos[1])
     ];
 
     const testBall = new Ball({ pos });
-    testBall.checkWalls(game.level);
+    testBall.checkCollissions(level);
 
     if (testBall.inObstacle) {
       this.vel = [vx, -vy];
@@ -454,10 +463,10 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     this.inObstacle = false;
   }
 
-  checkCollissions(gameObjects) {
-    this.checkHole(gameObjects.level);
-    this.checkLevelBoundaries(gameObjects.level);
-    this.checkWalls(gameObjects.level);
+  checkCollissions(level) {
+    this.checkHole(level);
+    this.checkLevelBoundaries(level);
+    this.checkWalls(level);
   }
 
   checkHole(level) {
@@ -474,10 +483,13 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
   checkLevelBoundaries(level) {
     const [x, y] = this.pos;
     const { height, width } = level;
-    if (x > width   ||
-        y > height  ||
-        x < 0       ||
-        y < 0        ) {
+
+    const x1 = (640 - width) / 2;
+    const y1 = (480 - height) / 2;
+    const x2 = width + x1;
+    const y2 = height + y1;
+
+    if (y < y1 || y > y2 || x < x1 || x > x2) {
       this.inObstacle = true;
     }
   }
@@ -603,7 +615,7 @@ class UI {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ui_object__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ui_object__ = __webpack_require__(3);
 
 
 class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* default */] {
@@ -624,7 +636,7 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ui_object__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ui_object__ = __webpack_require__(3);
 
 
 class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* default */] {
@@ -656,6 +668,8 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__level_1__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__level_2__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__level_3__ = __webpack_require__(16);
+
 
 
 
@@ -670,26 +684,24 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_level__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_wall__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_level__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_wall__ = __webpack_require__(2);
 
 
 
 const walls = [
 ];
 
-const level1 = new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
-  height: 480,
-  width: 640,
+  height: 200,
+  width: 600,
   ballStartPos: [35, 250],
   hole: {
     pos: [550, 250],
     radius: 10
   }
-});
-
-/* harmony default export */ __webpack_exports__["a"] = (level1);
+}));
 
 
 /***/ }),
@@ -697,8 +709,34 @@ const level1 = new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] 
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_level__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_wall__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_level__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_wall__ = __webpack_require__(2);
+
+
+
+const walls = [
+  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([300, 180, 60, 140])
+];
+
+/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+  walls,
+  height: 200,
+  width: 600,
+  ballStartPos: [35, 250],
+  hole: {
+    pos: [550, 250],
+    radius: 10
+  }
+}));
+
+
+/***/ }),
+/* 16 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_level__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_wall__ = __webpack_require__(2);
 
 
 
@@ -709,18 +747,16 @@ const walls = [
   new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([200, 300, 40, 40])
 ];
 
-const level1 = new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+/* unused harmony default export */ var _unused_webpack_default_export = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
-  height: 480,
-  width: 640,
+  height: 200,
+  width: 600,
   ballStartPos: [20, 20],
   hole: {
     pos: [320, 260],
     radius: 10
   }
-});
-
-/* harmony default export */ __webpack_exports__["a"] = (level1);
+}));
 
 
 /***/ })
