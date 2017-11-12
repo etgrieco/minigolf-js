@@ -247,10 +247,11 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     this.vel = vel;
     this.radius = radius;
     this.inObstacle = false;
+    this.inHole = false;
   }
 
   draw(ctx) {
-    if (!this.inObstacle) {
+    if (!(this.inObstacle || this.inHole)) {
       ctx.beginPath();
       ctx.arc(this.pos[0], this.pos[1], this.radius, 0, 2 * Math.PI);
       ctx.stroke();
@@ -316,7 +317,7 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     const minimumDistance = holeRadius + radius;
 
     if (__WEBPACK_IMPORTED_MODULE_0__physics__["a" /* default */].dist(pos, holePos) < minimumDistance){
-      this.inObstacle = true;
+      this.inHole = true;
     }
   }
 
@@ -520,7 +521,7 @@ const level1 = new __WEBPACK_IMPORTED_MODULE_0__level__["a" /* default */] ({
   width: 640,
   ballStartPos: [320, 250],
   hole: {
-    pos: [640 * Math.random(), 480 * Math.random()],
+    pos: [320, 150],
     radius: 10
   }
 });
