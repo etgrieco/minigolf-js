@@ -112,7 +112,6 @@ class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, 2 * Math.PI);
     ctx.fill();
-    ctx.stroke();
   }
 
   drawWalls(ctx) {
@@ -238,7 +237,7 @@ class GameView {
     this.ball = this.game.addBall();
     this.putter = this.game.addPutter();
     this.bindKeyHandlers();
-    setInterval(() => {
+    requestAnimationFrame(() => {
       this.checkHole(this.game);
       this.game.moveObjects();
       this.game.checkCollissions();
@@ -268,7 +267,7 @@ class GameView {
 
   changeTheta(e) {
     const modifier = e.shiftKey ? .3 : 1;
-    
+
     switch (e.key) {
       case "s":
       case "ArrowDown":
@@ -799,7 +798,6 @@ class PowerMeter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* default
     const fill = putter.vel;
 
     ctx.rect(500, 435, fill, 30);
-    ctx.stroke();
   }
 
 }
