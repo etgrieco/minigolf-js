@@ -237,7 +237,7 @@ class GameView {
     this.ball = this.game.addBall();
     this.putter = this.game.addPutter();
     this.bindKeyHandlers();
-    requestAnimationFrame(() => {
+    setInterval(() => {
       this.checkHole(this.game);
       this.game.moveObjects();
       this.game.checkCollissions();
@@ -363,9 +363,9 @@ class Game {
     );
   }
 
-  moveObjects() {
+  moveObjects(delta) {
     Object.values(this.gameObjects).forEach(
-      (obj) => obj.move(this));
+      (obj) => obj.move(this, delta));
   }
 
   checkCollissions() {
@@ -414,26 +414,29 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     }
   }
 
-  move(game) {
+  move(game, delta) {
     let [vx, vy] = this.vel;
-    if (!this.inObstacle) {
-      //calculate adjusted velocity
-      if (vx !== 0 || vy !== 0) {
-        [vx, vy] = [vx / 1.02, vy / 1.02];
-        if (Math.abs(vx) < .1 && Math.abs(vy) < .1) {
-          [vx, vy] = [0, 0];
-          this.isMoving = false;
-        }
-        this.vel = [vx, vy];
-      }
-    } else { // check ricochet direction
-      this.checkRicochet(vx, vy, game.level);
+    if (this.inObstacle) {
+      this.ricochet(vx, vy, game.level);
     }
+    [vx, vy] = this.vel;
+    this.decellerate(vx, vy);
 
     //calculate new position
-    const x = this.pos[0] + this.vel[0];
-    const y = this.pos[1] + this.vel[1];
+    const x = this.pos[0] + vx;
+    const y = this.pos[1] + vy;
     this.pos = [x, y];
+  }
+
+  decellerate(vx, vy) {
+    if (vx !== 0 || vy !== 0) {
+      [vx, vy] = [vx / 1.02, vy / 1.02];
+      if (Math.abs(vx) < .1 && Math.abs(vy) < .1) {
+        [vx, vy] = [0, 0];
+        this.isMoving = false;
+      }
+      this.vel = [vx, vy];
+    }
   }
 
   hit(putter) {
@@ -445,7 +448,7 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     this.isMoving = true;
   }
 
-  checkRicochet(vx, vy, level) {
+  ricochet(vx, vy, level) {
     const pos = [
       (this.pos[0] - vx),
       this.pos[1]
