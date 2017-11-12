@@ -107,11 +107,7 @@ class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */
   }
 
   drawHole(ctx) {
-    const { radius, pos } = this.hole;
-    const [x, y] = pos;
-    ctx.beginPath();
-    ctx.arc(x, y, radius, 0, 2 * Math.PI);
-    ctx.fill();
+    this.hole.draw(ctx);
   }
 
   drawWalls(ctx) {
@@ -123,10 +119,6 @@ class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */
     const y = (480 - this.height) / 2;
     ctx.rect(x, y, this.width, this.height);
     ctx.stroke();
-  }
-
-  move() {
-
   }
 
 }
@@ -719,21 +711,25 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_level__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_wall__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__game_hole__ = __webpack_require__(18);
+
 
 
 
 const walls = [
 ];
 
+const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
+  pos: [550, 250],
+  radius: 10
+});
+
 /* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
   height: 200,
   width: 600,
   ballStartPos: [35, 250],
-  hole: {
-    pos: [550, 250],
-    radius: 10
-  }
+  hole
 }));
 
 
@@ -820,6 +816,34 @@ class PowerMeter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* default
 }
 
 /* harmony default export */ __webpack_exports__["a"] = (PowerMeter);
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_object__ = __webpack_require__(0);
+
+
+class Hole extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */] {
+
+  constructor(props) {
+    super();
+    Object.assign(this, props);
+  }
+
+  draw(ctx) {
+    const { radius, pos } = this;
+    const [x, y] = pos;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, 2 * Math.PI);
+    ctx.fill();
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (Hole);
 
 
 /***/ })
