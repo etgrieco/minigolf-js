@@ -491,7 +491,7 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     const { pos, radius } = this;
     const minimumDistance = holeRadius + radius;
 
-    if (__WEBPACK_IMPORTED_MODULE_0__physics__["a" /* default */].dist(pos, holePos) < minimumDistance){
+    if (__WEBPACK_IMPORTED_MODULE_0__physics__["a" /* default */].dist(pos, holePos) <= minimumDistance){
       this.inHole = true;
     }
   }
