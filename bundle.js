@@ -431,6 +431,9 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     this.inObstacle = false;
     this.inHole = false;
     this.isMoving = false;
+
+    this.sx = Math.floor(Math.random() * 5) * 128;
+    this.sy = Math.floor(Math.random() * 5) * 128;
   }
 
   draw(ctx) {
@@ -443,8 +446,8 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
       // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
       const slice = {
         img,
-        sx: 0,
-        sy: 0,
+        sx: this.sx,
+        sy: this.sy,
         sWidth: 128,
         sHeight: 128,
         dx: dx - 16,
