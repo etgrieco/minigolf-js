@@ -789,7 +789,10 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
     ctx.font = "30px Roboto";
     ctx.textAlign = "left";
     ctx.fillStyle = "black";
-    ctx.fillText(`Strokes: ${this.game.strokes} / ${this.game.level.par}`, 20, 460);
+    ctx.fillText(
+      `Strokes: ${this.game.strokes} / ${this.game.level.par}`,
+        40, 460
+    );
   }
 
 }
@@ -821,7 +824,7 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
     ctx.font = "30px Roboto";
     ctx.fillStyle = "black";
     ctx.textAlign = "left";
-    ctx.fillText(`Score: ${this.score}`, 240, 460);
+    ctx.fillText(`Score: ${this.score}`, 280, 460);
   }
 
 }
@@ -844,20 +847,20 @@ class PowerMeter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* default
     ctx.font = "30px Roboto";
     ctx.textAlign = "left";
     ctx.fillStyle = "black";
-    ctx.fillText("Power:", 400, 460);
+    ctx.fillText("Power:", 450, 460);
 
     //power interior
     const putter = this.game.gameObjects.putter;
     const fill = putter.vel;
     ctx.beginPath();
     ctx.fillStyle = "blue";
-    ctx.rect(500, 435, fill, 30);
+    ctx.rect(550, 435, fill, 30);
     ctx.fill();
     ctx.stroke();
 
     //power exterior
     ctx.beginPath();
-    ctx.rect(500, 435, 120, 30);
+    ctx.rect(550, 435, 120, 30);
     ctx.stroke();
   }
 
