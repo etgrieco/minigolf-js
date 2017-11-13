@@ -128,6 +128,8 @@ class UIObject {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_object__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_view__ = __webpack_require__(6);
+
 
 
 class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */] {
@@ -152,8 +154,8 @@ class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */
   }
 
   drawBoundaries(ctx) {
-    const x =  (640 - this.width) / 2;
-    const y = (480 - this.height) / 2;
+    const x =  (__WEBPACK_IMPORTED_MODULE_1__game_view__["a" /* default */].DIM_X - this.width) / 2;
+    const y = (__WEBPACK_IMPORTED_MODULE_1__game_view__["a" /* default */].DIM_Y - this.height) / 2;
     ctx.beginPath();
     ctx.fillStyle = "#9AE19D";
     ctx.rect(x, y, this.width, this.height);
@@ -389,7 +391,7 @@ class GameView {
 
 }
 
-GameView.DIM_X = 640;
+GameView.DIM_X = 720;
 GameView.DIM_Y = 480;
 
 /* harmony default export */ __webpack_exports__["a"] = (GameView);
@@ -480,6 +482,8 @@ class Game {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__physics__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_object__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__game_view__ = __webpack_require__(6);
+
 
 
 
@@ -604,8 +608,8 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     const [x, y] = this.pos;
     const { height, width } = level;
 
-    const x1 = (640 - width) / 2;
-    const y1 = (480 - height) / 2;
+    const x1 = (__WEBPACK_IMPORTED_MODULE_2__game_view__["a" /* default */].DIM_X - width) / 2;
+    const y1 = (__WEBPACK_IMPORTED_MODULE_2__game_view__["a" /* default */].DIM_Y - height) / 2;
     const x2 = width + x1;
     const y2 = height + y1;
 
@@ -701,7 +705,6 @@ class Putter extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default *
       // DEBUG: LINE
       // const lineY = 100 * Math.sin(this.theta) + y;
       // const lineX = 100 * Math.cos(this.theta) + x;
-      //
       ctx.beginPath();
       // ctx.moveTo(x, y);
       // ctx.lineTo(lineX, lineY);
@@ -894,7 +897,7 @@ const walls = [
 ];
 
 const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
-  pos: [550, 250],
+  pos: [600, 250],
   radius: 10
 });
 
@@ -902,7 +905,7 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   walls,
   height: 200,
   width: 600,
-  ballStartPos: [45, 250],
+  ballStartPos: [100, 250],
   hole
 }));
 
@@ -924,7 +927,7 @@ const walls = [
 ];
 
 const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
-  pos: [550, 250],
+  pos: [600, 250],
   radius: 10
 });
 
@@ -932,7 +935,7 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   walls,
   height: 200,
   width: 600,
-  ballStartPos: [45, 250],
+  ballStartPos: [100, 250],
   hole
 }));
 
@@ -957,7 +960,7 @@ const walls = [
 ];
 
 const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
-  pos: [550, 250],
+  pos: [600, 250],
   radius: 10
 });
 
@@ -965,7 +968,7 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   walls,
   height: 200,
   width: 600,
-  ballStartPos: [45, 250],
+  ballStartPos: [100, 250],
   hole
 }));
 
