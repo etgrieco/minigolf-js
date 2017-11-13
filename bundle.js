@@ -702,8 +702,8 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
 
 
 /* harmony default export */ __webpack_exports__["a"] = ([
-  // level1,
-  // level2,
+  __WEBPACK_IMPORTED_MODULE_0__level_1__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_1__level_2__["a" /* default */],
   __WEBPACK_IMPORTED_MODULE_2__level_3__["a" /* default */]
 ]);
 
@@ -728,7 +728,7 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   radius: 10
 });
 
-/* unused harmony default export */ var _unused_webpack_default_export = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
   height: 200,
   width: 600,
@@ -758,7 +758,7 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   radius: 10
 });
 
-/* unused harmony default export */ var _unused_webpack_default_export = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
   height: 200,
   width: 600,
@@ -844,6 +844,12 @@ class Hole extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */]
   constructor(props) {
     super();
     Object.assign(this, props);
+
+    //Animation variables
+    this.currentFrame = 0;
+    this.counter = 0;
+    this.endFrame = 4;
+    this.frameSpeed = 10;
   }
 
   draw(ctx) {
@@ -853,6 +859,7 @@ class Hole extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */]
     const img = new Image();
     img.src = "./sprites/hole.png";
 
+    this.update();
     // test position
     // ctx.beginPath();
     // ctx.arc(dx, dy, radius, 0, 2 * Math.PI);
@@ -862,8 +869,8 @@ class Hole extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */]
     // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
     const slice = {
       img,
-      sx: 0,
-      sy: 0,
+      sx: 64 * this.currentFrame,
+      sy: 128,
       sWidth: 64,
       sHeight: 64,
       dx: dx - this.radius * 3,
@@ -873,6 +880,14 @@ class Hole extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */]
     };
 
     ctx.drawImage(...Object.values(slice));
+  }
+
+  update() {
+    const { counter, frameSpeed, endFrame } = this;
+    if (counter === (frameSpeed - 1)) {
+      this.currentFrame = (this.currentFrame + 1) % endFrame;
+    }
+    this.counter = (counter + 1) % frameSpeed;
   }
 
 }
