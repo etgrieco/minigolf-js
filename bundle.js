@@ -297,6 +297,7 @@ class GameView {
   }
 
   advanceLevel() {
+    this.ui.addScore(this.game);
     this.level++;
     this.game = new __WEBPACK_IMPORTED_MODULE_0__game_game__["a" /* default */]({
       level: __WEBPACK_IMPORTED_MODULE_2__levels_levels__["a" /* default */][this.level]
@@ -758,8 +759,11 @@ class UI {
     Object.values(this.uiObjects).forEach((obj) => obj.draw(ctx));
   }
 
+  addScore(game) {
+    this.uiObjects.score.addScore(game);
+  }
+
   advanceLevel(game) {
-    this.uiObjects.score.addScore();
     const strokes = new __WEBPACK_IMPORTED_MODULE_0__stroke_counter__["a" /* default */](game);
     const power = new __WEBPACK_IMPORTED_MODULE_2__power_meter__["a" /* default */](game);
     Object.assign(this.uiObjects, {strokes, power});
@@ -785,7 +789,7 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
     ctx.font = "30px Roboto";
     ctx.textAlign = "left";
     ctx.fillStyle = "black";
-    ctx.fillText(`Strokes: ${this.game.strokes}`, 20, 460);
+    ctx.fillText(`Strokes: ${this.game.strokes} / ${this.game.level.par}`, 20, 460);
   }
 
 }
@@ -804,12 +808,12 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
 class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* default */] {
 
   constructor(game) {
-    super(game);
+    super();
     this.score = 0;
   }
 
-  addScore() {
-    this.score += this.game.strokes;
+  addScore(game) {
+    this.score +=  game.strokes - game.level.par;
   }
 
   draw(ctx) {
@@ -817,7 +821,7 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
     ctx.font = "30px Roboto";
     ctx.fillStyle = "black";
     ctx.textAlign = "left";
-    ctx.fillText(`Score: ${this.score}`, 200, 460);
+    ctx.fillText(`Score: ${this.score}`, 240, 460);
   }
 
 }
@@ -906,7 +910,8 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   height: 200,
   width: 600,
   ballStartPos: [100, 250],
-  hole
+  hole,
+  par: 2
 }));
 
 
@@ -936,7 +941,8 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   height: 200,
   width: 600,
   ballStartPos: [100, 250],
-  hole
+  hole,
+  par: 3
 }));
 
 
@@ -969,7 +975,8 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   height: 200,
   width: 600,
   ballStartPos: [100, 250],
-  hole
+  hole,
+  par: 4
 }));
 
 
