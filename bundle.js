@@ -129,16 +129,15 @@ class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */
 
   drawWalls(ctx) {
     this.walls.forEach((wall) => wall.draw(ctx));
-    ctx.stroke();
-    ctx.closePath();
   }
 
   drawBoundaries(ctx) {
     const x =  (640 - this.width) / 2;
     const y = (480 - this.height) / 2;
+    ctx.beginPath();
+    ctx.fillStyle = "green";
     ctx.rect(x, y, this.width, this.height);
-    ctx.stroke();
-    ctx.closePath();
+    ctx.fill();
   }
 
 }
@@ -162,7 +161,10 @@ class Wall extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */]
   }
 
   draw(ctx) {
+    ctx.beginPath();
     ctx.rect(...this.dimensions);
+    ctx.fillStyle = "white";
+    ctx.fill();
   }
 
 }
@@ -202,7 +204,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  const canvas = document.querySelector('canvas');
+  const canvas = document.getElementById('game');
   const ctx = canvas.getContext('2d');
 
   new __WEBPACK_IMPORTED_MODULE_0__lib_game_view__["a" /* default */](ctx);
@@ -493,7 +495,6 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
 
   hit(putter) {
     let { vel, theta } = putter;
-    console.log(vel);
     const vx = vel / 8 * Math.cos(theta);
     const vy = vel / 8 * Math.sin(theta);
 
@@ -710,8 +711,10 @@ class UI {
 class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* default */] {
 
   draw(ctx) {
+    ctx.beginPath();
     ctx.font = "30px Arial";
     ctx.textAlign = "left";
+    ctx.fillStyle = "black";
     ctx.fillText(`Strokes: ${this.game.strokes}`, 20, 460);
   }
 
@@ -740,7 +743,9 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
   }
 
   draw(ctx) {
+    ctx.beginPath();
     ctx.font = "30px Arial";
+    ctx.fillStyle = "black";
     ctx.textAlign = "left";
     ctx.fillText(`Score: ${this.score}`, 200, 460);
   }
@@ -872,16 +877,23 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
 class PowerMeter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* default */] {
 
   draw(ctx) {
+    ctx.beginPath();
     ctx.font = "30px Arial";
     ctx.textAlign = "left";
+    ctx.fillStyle = "black";
     ctx.fillText("Power:", 400, 460);
+
     //power interior
     const putter = this.game.gameObjects.putter;
     const fill = putter.vel;
-
+    ctx.beginPath();
+    ctx.fillStyle = "blue";
     ctx.rect(500, 435, fill, 30);
+    ctx.fill();
+    ctx.stroke();
 
     //power exterior
+    ctx.beginPath();
     ctx.rect(500, 435, 120, 30);
     ctx.stroke();
   }
