@@ -432,7 +432,7 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     this.inHole = false;
     this.isMoving = false;
 
-    this.sx = Math.floor(Math.random() * 5) * 128;
+    this.sx = Math.floor(Math.random() * 4) * 128;
     this.sy = Math.floor(Math.random() * 5) * 128;
   }
 
