@@ -258,13 +258,12 @@ class Hole extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */]
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_game_view__ = __webpack_require__(6);
-// import Ball from './lib/ball';
-
 
 
 document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById('game');
   const ctx = canvas.getContext('2d');
+  canvas.tabIndex = 1;
 
   new __WEBPACK_IMPORTED_MODULE_0__lib_game_view__["a" /* default */](ctx);
 });
@@ -346,31 +345,33 @@ class GameView {
 
   changeTheta(e) {
     const modifier = e.shiftKey ? .3 : 1;
-
     switch (e.key) {
       case "s":
       case "S":
       case "ArrowDown":
         this.putter.theta += this.putter.thetaDirection * .2 * modifier;
+        e.preventDefault();
         break;
       case "w":
       case "W":
       case "ArrowUp":
         this.putter.theta -= this.putter.thetaDirection * .2 * modifier;
+        e.preventDefault();
         break;
       case "a":
       case "A":
       case "ArrowLeft":
         this.putter.theta = Math.PI;
         this.putter.thetaDirection = -1;
+        e.preventDefault();
         break;
       case "d":
       case "D":
       case "ArrowRight":
         this.putter.thetaDirection = 1;
         this.putter.theta = 0;
+        e.preventDefault();
         break;
-      default:
     }
   }
 
@@ -380,6 +381,7 @@ class GameView {
         if (this.game.hit()) {
           this.game.addStroke();
         }
+        e.preventDefault();
         break;
       default:
     }
