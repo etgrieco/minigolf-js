@@ -69,6 +69,11 @@
 
 "use strict";
 class GameObject {
+
+  constructor() {
+
+  }
+
   draw(ctx, game) {
 
   }
@@ -80,6 +85,18 @@ class GameObject {
   checkCollissions() {
 
   }
+
+  update() {
+    this.currentFrame = this.currentFrame || 0;
+    this.counter = this.counter || 0;
+    const { counter, frameSpeed, endFrame, currentFrame } = this;
+
+    if (counter === (frameSpeed - 1)) {
+      this.currentFrame = (currentFrame + 1) % endFrame;
+    }
+    this.counter = (counter + 1) % frameSpeed;
+  }
+
 }
 
 /* harmony default export */ __webpack_exports__["a"] = (GameObject);
@@ -113,6 +130,7 @@ class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */
   drawWalls(ctx) {
     this.walls.forEach((wall) => wall.draw(ctx));
     ctx.stroke();
+    ctx.closePath();
   }
 
   drawBoundaries(ctx) {
@@ -120,6 +138,7 @@ class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */
     const y = (480 - this.height) / 2;
     ctx.rect(x, y, this.width, this.height);
     ctx.stroke();
+    ctx.closePath();
   }
 
 }
@@ -414,9 +433,30 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
 
   draw(ctx) {
     if (!this.inHole) {
-      ctx.beginPath();
-      ctx.arc(this.pos[0], this.pos[1], this.radius, 0, 2 * Math.PI);
-      ctx.stroke();
+      const img = new Image();
+      img.src = "./sprites/ball.png";
+      const { radius, pos } = this;
+      const [dx, dy] = pos;
+
+      // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+      const slice = {
+        img,
+        sx: 0,
+        sy: 0,
+        sWidth: 128,
+        sHeight: 128,
+        dx: dx - 16,
+        dy: dy - 14,
+        dWidth: 23,
+        dHeight: 23
+      };
+
+      ctx.drawImage(...Object.values(slice));
+
+      // DEBUG: TEST BALL CIRCLE
+      // ctx.beginPath();
+      // ctx.arc(this.pos[0], this.pos[1], this.radius, 0, 2 * Math.PI);
+      // ctx.stroke();
     }
   }
 
@@ -522,7 +562,7 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
   }
 }
 
-Ball.DELTA_ADJUSTMENT = 10;
+Ball.DELTA_ADJUSTMENT = 12;
 
 /* harmony default export */ __webpack_exports__["a"] = (Ball);
 
@@ -569,13 +609,34 @@ class Putter extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default *
   draw(ctx, game) {
     const ball = game.gameObjects.ball;
     if(!ball.isMoving) {
+      const img = new Image();
+      img.src = "./sprites/crosshair.png";
       const [x, y] = this.pos;
-      const lineY = 100 * Math.sin(this.theta) + y;
-      const lineX = 100 * Math.cos(this.theta) + x;
+      const dx = 100 * Math.cos(this.theta) + x;
+      const dy = 100 * Math.sin(this.theta) + y;
 
+      // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+      const slice = {
+        img,
+        sx: 0,
+        sy: 0,
+        sWidth: 128,
+        sHeight: 128,
+        dx: dx - 20,
+        dy: dy - 32,
+        dWidth: 128,
+        dHeight: 128
+      };
+
+      ctx.drawImage(...Object.values(slice));
+
+      // DEBUG: LINE
+      // const lineY = 100 * Math.sin(this.theta) + y;
+      // const lineX = 100 * Math.cos(this.theta) + x;
+      //
       ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(lineX, lineY);
+      // ctx.moveTo(x, y);
+      // ctx.lineTo(lineX, lineY);
       ctx.stroke();
     }
   }
@@ -814,16 +875,15 @@ class PowerMeter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* default
     ctx.font = "30px Arial";
     ctx.textAlign = "left";
     ctx.fillText("Power:", 400, 460);
-
-    //power exterior
-    ctx.rect(500, 435, 120, 30);
-    ctx.stroke();
-
     //power interior
     const putter = this.game.gameObjects.putter;
     const fill = putter.vel;
 
     ctx.rect(500, 435, fill, 30);
+
+    //power exterior
+    ctx.rect(500, 435, 120, 30);
+    ctx.stroke();
   }
 
 }
@@ -846,8 +906,6 @@ class Hole extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */]
     Object.assign(this, props);
 
     //Animation variables
-    this.currentFrame = 0;
-    this.counter = 0;
     this.endFrame = 4;
     this.frameSpeed = 10;
   }
@@ -860,7 +918,8 @@ class Hole extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */]
     img.src = "./sprites/hole.png";
 
     this.update();
-    // test position
+
+    // DEBUG: VIEW CIRCLE POSITION
     // ctx.beginPath();
     // ctx.arc(dx, dy, radius, 0, 2 * Math.PI);
     // ctx.fill();
@@ -873,21 +932,13 @@ class Hole extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */]
       sy: 128,
       sWidth: 64,
       sHeight: 64,
-      dx: dx - this.radius * 3,
-      dy: dy - this.radius * 4,
+      dx: dx - 32,
+      dy: dy - 40,
       dWidth: 64,
       dHeight: 64
     };
 
     ctx.drawImage(...Object.values(slice));
-  }
-
-  update() {
-    const { counter, frameSpeed, endFrame } = this;
-    if (counter === (frameSpeed - 1)) {
-      this.currentFrame = (this.currentFrame + 1) % endFrame;
-    }
-    this.counter = (counter + 1) % frameSpeed;
   }
 
 }
