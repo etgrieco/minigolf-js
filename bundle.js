@@ -158,6 +158,10 @@ class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */
     ctx.fillStyle = "#9AE19D";
     ctx.rect(x, y, this.width, this.height);
     ctx.fill();
+    ctx.strokeStyle = "#2F4858";
+    ctx.lineWidth = 10;
+    ctx.stroke();
+    ctx.lineWidth = 1;
   }
 
 }
@@ -896,7 +900,7 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   walls,
   height: 200,
   width: 600,
-  ballStartPos: [35, 250],
+  ballStartPos: [45, 250],
   hole
 }));
 
@@ -926,7 +930,7 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   walls,
   height: 200,
   width: 600,
-  ballStartPos: [35, 250],
+  ballStartPos: [45, 250],
   hole
 }));
 
@@ -959,7 +963,7 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   walls,
   height: 200,
   width: 600,
-  ballStartPos: [35, 250],
+  ballStartPos: [45, 250],
   hole
 }));
 
