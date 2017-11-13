@@ -1,0 +1,22 @@
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+main h1 {
+  font-family: 'Abril Fatface', cursive;
+}
+
+.play-notes {
+  text-align: left;
+}
+
+
+canvas {
+  border: 1px solid black;
+}

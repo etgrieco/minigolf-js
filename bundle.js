@@ -114,7 +114,7 @@ class UIObject {
   }
 
   draw() {
-
+    
   }
 
 }
@@ -187,7 +187,7 @@ class Wall extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */]
   draw(ctx) {
     ctx.beginPath();
     ctx.rect(...this.dimensions);
-    ctx.fillStyle = "white";
+    ctx.fillStyle = "#2F4858";
     ctx.fill();
   }
 
@@ -777,7 +777,7 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
 
   draw(ctx) {
     ctx.beginPath();
-    ctx.font = "30px Arial";
+    ctx.font = "30px Roboto";
     ctx.textAlign = "left";
     ctx.fillStyle = "black";
     ctx.fillText(`Strokes: ${this.game.strokes}`, 20, 460);
@@ -809,7 +809,7 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
 
   draw(ctx) {
     ctx.beginPath();
-    ctx.font = "30px Arial";
+    ctx.font = "30px Roboto";
     ctx.fillStyle = "black";
     ctx.textAlign = "left";
     ctx.fillText(`Score: ${this.score}`, 200, 460);
@@ -832,7 +832,7 @@ class PowerMeter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* default
 
   draw(ctx) {
     ctx.beginPath();
-    ctx.font = "30px Arial";
+    ctx.font = "30px Roboto";
     ctx.textAlign = "left";
     ctx.fillStyle = "black";
     ctx.fillText("Power:", 400, 460);
