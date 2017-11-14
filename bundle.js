@@ -712,7 +712,9 @@ class Putter extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default *
       const lineX = 100 * Math.cos(this.theta) + x;
       ctx.moveTo(x, y);
       ctx.lineTo(lineX, lineY);
+      ctx.lineWidth = 3;
       ctx.stroke();
+      ctx.lineWidth = 1;
     }
   }
 
