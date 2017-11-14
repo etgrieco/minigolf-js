@@ -931,7 +931,7 @@ Message.POS_Y = 100;
 /* harmony default export */ __webpack_exports__["a"] = ([
   __WEBPACK_IMPORTED_MODULE_0__level_1__["a" /* default */],
   __WEBPACK_IMPORTED_MODULE_1__level_2__["a" /* default */],
-  // level3
+  __WEBPACK_IMPORTED_MODULE_2__level_3__["a" /* default */]
 ]);
 
 
@@ -1020,7 +1020,7 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   radius: 10
 });
 
-/* unused harmony default export */ var _unused_webpack_default_export = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
   height: 200,
   width: 600,
