@@ -301,6 +301,15 @@ class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */
 
 }
 
+Level.isLevelOver = game => {
+  const ball = game.gameObjects.ball;
+  return (ball && ball.inHole);
+};
+
+Level.isGameOver = game => {
+  return game.strokes > game.level.par && !game.gameObjects.ball.isMoving;
+};
+
 /* harmony default export */ __webpack_exports__["a"] = (Level);
 
 
@@ -448,7 +457,6 @@ class Game {
     const { ball, putter } = this.gameObjects;
     if (!ball.isMoving) {
       ball.hit(putter);
-      this.updateMessage();
       return true;
     }
     return false;
@@ -471,6 +479,7 @@ class Game {
 
   addStroke() {
     this.strokes++;
+    this.updateMessage();
   }
 
   updateMessage() {
@@ -552,15 +561,15 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
       }
 
       [vx, vy] = this.vel;
-      this.decellerate(vx, vy);
+      this.decellerate(vx, vy, game.level.rate);
       this.translate(vx, vy, delta);
     }
 
   }
 
-  decellerate(vx, vy) {
+  decellerate(vx, vy, rate) {
     if (vx !== 0 || vy !== 0) {
-      [vx, vy] = [vx / 1.02, vy / 1.02];
+      [vx, vy] = [vx / rate, vy / rate];
       if (Math.abs(vx) < .1 && Math.abs(vy) < .1) {
         [vx, vy] = [0, 0];
         this.isMoving = false;
@@ -694,26 +703,27 @@ class Putter extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default *
   draw(ctx, game) {
     const ball = game.gameObjects.ball;
     if(!ball.isMoving) {
-      const img = new Image();
-      img.src = "./sprites/crosshair.png";
       const [x, y] = this.pos;
-      const dx = 100 * Math.cos(this.theta) + x;
-      const dy = 100 * Math.sin(this.theta) + y;
 
-      // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
-      const slice = {
-        img,
-        sx: 0,
-        sy: 0,
-        sWidth: 128,
-        sHeight: 128,
-        dx: dx - 20,
-        dy: dy - 32,
-        dWidth: 128,
-        dHeight: 128
-      };
+      // const img = new Image();
+      // img.src = "./sprites/crosshair.png";
+      // const dx = 100 * Math.cos(this.theta) + x;
+      // const dy = 100 * Math.sin(this.theta) + y;
+      //
+      // // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+      // const slice = {
+      //   img,
+      //   sx: 0,
+      //   sy: 0,
+      //   sWidth: 128,
+      //   sHeight: 128,
+      //   dx: dx - 20,
+      //   dy: dy - 32,
+      //   dWidth: 128,
+      //   dHeight: 128
+      // };
 
-      ctx.drawImage(...Object.values(slice));
+      // ctx.drawImage(...Object.values(slice));
 
       // DEBUG: LINE
       ctx.beginPath();
@@ -1077,17 +1087,19 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
 const walls = [
 ];
 
-  const hole = null;
-
   const messages = {
-    0: "...",
-    1: "hungrier...",
-    2: "HAAAANGRY!!!"
+    0: "Go ahead, press the space bar",
+    1: "Press it again",
+    2: "Notice your speed.",
+    3: "It corresponds to the power meter",
+    4: "Do you get it yet?",
+    5: "Move the arrow keys",
+    6: "That determines your direction",
+    7: "Makes sense?",
   };
 
 const isLevelOver = game => {
-  const ball = game.gameObjects.ball;
-  return (ball && ball.inHole);
+  return game.strokes > 7;
 };
 
 const isGameOver = game => {
@@ -1099,11 +1111,12 @@ const isGameOver = game => {
   height: 200,
   width: 600,
   ballStartPos: [360, 250],
-  hole,
-  par: 2,
+  hole: null,
+  par: "∞",
   messages,
   isLevelOver,
-  isGameOver
+  isGameOver,
+  rate: 1.1
 }));
 
 
