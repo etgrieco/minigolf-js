@@ -120,11 +120,13 @@ class GameView {
     this.ctx = ctx;
     this.level = 0;
     this.game = new __WEBPACK_IMPORTED_MODULE_0__game_game__["a" /* default */]({
-      level: __WEBPACK_IMPORTED_MODULE_2__levels_levels__["a" /* default */][this.level]
+      level: __WEBPACK_IMPORTED_MODULE_2__levels_levels__["a" /* default */][this.level],
+      gameView: this
     });
     this.ui = new __WEBPACK_IMPORTED_MODULE_1__ui_ui__["a" /* default */](this.game);
     this.start();
     this.endGame = false;
+    this.game.updateMessage();
   }
 
   start() {
@@ -143,8 +145,8 @@ class GameView {
     this.game.step(timeDelta);
     this.game.draw(this.ctx);
     this.ui.draw(this.ctx);
-    this.lastTime = time;
 
+    this.lastTime = time;
     requestAnimationFrame(this.animate.bind(this));
   }
 
@@ -159,7 +161,7 @@ class GameView {
       this.putter = this.game.addPutter();
     } else {
       this.endGame = true;
-      this.ui.endGameMessage();
+      this.ui.sendMessage();
     }
     this.ui.advanceLevel(this.game);
   }
@@ -222,6 +224,10 @@ class GameView {
         e.preventDefault();
         break;
     }
+  }
+
+  displayMessage(message) {
+    this.ui.displayMessage(message);
   }
 
 }
@@ -412,10 +418,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 class Game {
-  constructor({ level }) {
+  constructor({ level, gameView }) {
     this.level = level;
     this.gameObjects = { level };
     this.strokes = 0;
+    this.gameView = gameView;
   }
 
   addBall() {
@@ -445,6 +452,7 @@ class Game {
     const { ball, putter } = this.gameObjects;
     if (!ball.isMoving) {
       ball.hit(putter);
+      this.updateMessage();
       return true;
     }
     return false;
@@ -467,6 +475,11 @@ class Game {
 
   addStroke() {
     this.strokes++;
+  }
+
+  updateMessage() {
+    const message = this.level.messages[this.strokes];
+    this.gameView.displayMessage(message);
   }
 
   step(delta) {
@@ -778,9 +791,10 @@ class UI {
     Object.assign(this.uiObjects, {strokes, power});
   }
 
-  endGameMessage() {
-    this.uiObjects.message.displayMessage("End of Game!");
+  displayMessage(message) {
+    this.uiObjects.message.displayMessage(message);
   }
+
 }
 
 /* harmony default export */ __webpack_exports__["a"] = (UI);
@@ -896,9 +910,8 @@ class Message {
     this.message = message;
   }
 
-  draw(ctx) {
+  draw(ctx, game) {
     if (this.message) {
-      console.log("Writing message");
       ctx.beginPath();
       ctx.font = "30px Roboto";
       ctx.fillStyle = "black";
@@ -957,13 +970,20 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   radius: 10
 });
 
+const messages = {
+  0: "...",
+  1: "hungrier...",
+  2: "HAAAANGRY!!!"
+};
+
 /* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
   height: 200,
   width: 600,
   ballStartPos: [100, 250],
   hole,
-  par: 2
+  par: 2,
+  messages
 }));
 
 
