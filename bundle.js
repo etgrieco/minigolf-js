@@ -138,7 +138,7 @@ class GameView {
   }
 
   animate(time) {
-    this.checkHole(this.game);
+    this.checkLevelEnd(this.game);
 
     const timeDelta = time - this.lastTime;
     this.ctx.clearRect(0, 0, GameView.DIM_X, GameView.DIM_Y);
@@ -166,10 +166,11 @@ class GameView {
     this.ui.advanceLevel(this.game);
   }
 
-  checkHole(game) {
-    const { ball } = this.game.gameObjects;
-    if (ball && ball.inHole && !this.endGame) {
+  checkLevelEnd(game) {
+    if (game.level.isLevelOver(game)) {
       this.advanceLevel();
+    } else if (game.level.isGameOver(game)) {
+      // game over logic
     }
   }
 
@@ -277,12 +278,8 @@ class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */
 
   draw(ctx) {
     this.drawBoundaries(ctx);
-    this.drawHole(ctx);
+    this.hole ? this.hole.draw(ctx) : null; // allows for holeless levels
     this.drawWalls(ctx);
-  }
-
-  drawHole(ctx) {
-    this.hole.draw(ctx);
   }
 
   drawWalls(ctx) {
@@ -444,7 +441,6 @@ class Game {
     });
 
     this.gameObjects.putter = putter;
-    window.putter = putter;
     return putter;
   }
 
@@ -605,7 +601,7 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
   }
 
   checkCollissions(level) {
-    this.checkHole(level);
+    level.hole ? this.checkHole(level) : null;
     this.checkLevelBoundaries(level);
     this.checkWalls(level);
   }
@@ -936,17 +932,20 @@ Message.POS_Y = 100;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__level_1__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__level_2__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__level_3__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__level_0__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__level_1__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__level_2__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__level_3__ = __webpack_require__(19);
+
 
 
 
 
 /* harmony default export */ __webpack_exports__["a"] = ([
-  __WEBPACK_IMPORTED_MODULE_0__level_1__["a" /* default */],
-  __WEBPACK_IMPORTED_MODULE_1__level_2__["a" /* default */],
-  __WEBPACK_IMPORTED_MODULE_2__level_3__["a" /* default */]
+  __WEBPACK_IMPORTED_MODULE_0__level_0__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_1__level_1__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_2__level_2__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_3__level_3__["a" /* default */]
 ]);
 
 
@@ -976,6 +975,15 @@ const messages = {
   2: "HAAAANGRY!!!"
 };
 
+const isLevelOver = game => {
+  const ball = game.gameObjects.ball;
+  return (ball && ball.inHole);
+};
+
+const isGameOver = game => {
+  return game.strokes > game.level.par && !game.gameObjects.ball.isMoving;
+};
+
 /* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
   height: 200,
@@ -983,7 +991,9 @@ const messages = {
   ballStartPos: [100, 250],
   hole,
   par: 2,
-  messages
+  messages,
+  isLevelOver,
+  isGameOver
 }));
 
 
@@ -1049,6 +1059,51 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   ballStartPos: [100, 250],
   hole,
   par: 4
+}));
+
+
+/***/ }),
+/* 20 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_level__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_wall__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__game_hole__ = __webpack_require__(5);
+
+
+
+
+const walls = [
+];
+
+  const hole = null;
+
+  const messages = {
+    0: "...",
+    1: "hungrier...",
+    2: "HAAAANGRY!!!"
+  };
+
+const isLevelOver = game => {
+  const ball = game.gameObjects.ball;
+  return (ball && ball.inHole);
+};
+
+const isGameOver = game => {
+  return game.strokes > game.level.par && !game.gameObjects.ball.isMoving;
+};
+
+/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+  walls,
+  height: 200,
+  width: 600,
+  ballStartPos: [360, 250],
+  hole,
+  par: 2,
+  messages,
+  isLevelOver,
+  isGameOver
 }));
 
 
