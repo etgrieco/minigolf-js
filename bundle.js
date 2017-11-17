@@ -130,7 +130,6 @@ class GameView {
   }
 
   start() {
-    this.ball = this.game.addBall();
     this.putter = this.game.addPutter();
     this.bindKeyHandlers();
     this.lastTime = 0;
@@ -152,18 +151,14 @@ class GameView {
 
   advanceLevel() {
     this.ui.addScore(this.game);
-    this.level++;
-    if (this.level < __WEBPACK_IMPORTED_MODULE_2__levels_levels__["a" /* default */].length) {
-      this.game = new __WEBPACK_IMPORTED_MODULE_0__game_game__["a" /* default */]({
-        level: __WEBPACK_IMPORTED_MODULE_2__levels_levels__["a" /* default */][this.level]
-      });
-      this.ball = this.game.addBall();
-      this.putter = this.game.addPutter();
-    } else {
-      this.endGame = true;
-      this.ui.sendMessage();
-    }
+    this.level = (this.level + 1) % __WEBPACK_IMPORTED_MODULE_2__levels_levels__["a" /* default */].length;
+    this.game = new __WEBPACK_IMPORTED_MODULE_0__game_game__["a" /* default */]({
+      level: __WEBPACK_IMPORTED_MODULE_2__levels_levels__["a" /* default */][this.level],
+      gameView: this
+    });
+    this.putter = this.game.addPutter();
     this.ui.advanceLevel(this.game);
+    this.game.updateMessage();
   }
 
   checkLevelEnd(game) {
@@ -274,6 +269,8 @@ class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */
   constructor(props) {
     super();
     Object.assign(this, props);
+    this.isLevelOver = this.isLevelOver || Level.isLevelOver;
+    this.isGameOver = this.isGameOver || Level.isGameOver;
   }
 
   draw(ctx) {
@@ -428,6 +425,7 @@ class Game {
     this.level = level;
     this.gameObjects = { level };
     this.strokes = 0;
+    this.addBall();
     this.gameView = gameView;
   }
 
@@ -439,7 +437,6 @@ class Game {
     });
 
     this.gameObjects.ball = ball;
-    return ball;
   }
 
   addPutter(pos = this.level.ballStartPos) {
@@ -568,6 +565,8 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
   }
 
   decellerate(vx, vy, rate) {
+    rate = rate ? rate : 1.02;
+
     if (vx !== 0 || vy !== 0) {
       [vx, vy] = [vx / rate, vy / rate];
       if (Math.abs(vx) < .1 && Math.abs(vy) < .1) {
@@ -848,7 +847,9 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
   }
 
   addScore(game) {
-    this.score +=  game.strokes - game.level.par;
+    if ((Number(game.level.par))) {
+      this.score += (game.level.par - game.strokes) * 100;
+    }
   }
 
   draw(ctx) {
@@ -931,7 +932,7 @@ class Message {
 
 }
 
-Message.POS_X = 100;
+Message.POS_X = 50;
 Message.POS_Y = 100;
 
 /* harmony default export */ __webpack_exports__["a"] = (Message);
@@ -980,7 +981,7 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
 });
 
 const messages = {
-  0: "...",
+  0: "The monster is hungry. Don't take too long.",
   1: "hungrier...",
   2: "HAAAANGRY!!!"
 };
