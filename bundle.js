@@ -980,11 +980,11 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   radius: 10
 });
 
-const messages = {
-  0: "The monster is hungry. Don't take too long.",
-  1: "hungrier...",
-  2: "HAAAANGRY!!!"
-};
+const messages = [
+  "The monster is hungry. Don't take too long.",
+  "hungrier...",
+  "HAAAANGRY!!!"
+];
 
 const isLevelOver = game => {
   const ball = game.gameObjects.ball;
@@ -1088,16 +1088,16 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
 const walls = [
 ];
 
-  const messages = {
-    0: "Go ahead, press the space bar",
-    1: "Press it again",
-    2: "Notice your speed.",
-    3: "It corresponds to the power meter",
-    4: "Do you get it yet?",
-    5: "Move the arrow keys",
-    6: "That determines your direction",
-    7: "Makes sense?",
-  };
+  const messages = [
+    "Go ahead, press the space bar",
+    "Press it again",
+    "Notice your speed.",
+    "It corresponds to the power meter",
+    "Do you get it yet?",
+    "Move the arrow keys",
+    "That determines your direction",
+    "Makes sense?",
+  ];
 
 const isLevelOver = game => {
   return game.strokes > 7;
@@ -1117,7 +1117,7 @@ const isGameOver = game => {
   messages,
   isLevelOver,
   isGameOver,
-  rate: 1.1
+  rate: 1.05
 }));
 
 
