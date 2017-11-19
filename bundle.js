@@ -124,6 +124,7 @@ class GameView {
   advanceLevel() {
     this.ui.addScore(this.game);
     this.level = (this.level + 1) % (__WEBPACK_IMPORTED_MODULE_2__levels_levels__["a" /* default */].length - 1);
+    if (this.level < 1) { this.level++; }
     this.createNewLevel();
     this.ui.advanceLevel(this.game);
     this.game.updateMessage();
@@ -154,6 +155,7 @@ class GameView {
     } else if (game.level.isGameOver(game)) {
       this.level = __WEBPACK_IMPORTED_MODULE_2__levels_levels__["a" /* default */].length - 1;
       this.createNewLevel();
+      this.game.updateMessage();
     }
   }
 
@@ -164,6 +166,7 @@ class GameView {
       e => {
         this.changeTheta(e);
         this.changeVelocity(e);
+        this.restart(e);
       });
   }
 
@@ -194,6 +197,17 @@ class GameView {
       case "ArrowRight":
         this.putter.thetaDirection = 1;
         this.putter.theta = 0;
+        e.preventDefault();
+        break;
+    }
+  }
+
+  restart(e) {
+    switch (e.key) {
+      case "r":
+      case "R":
+        this.level = 0;
+        this.advanceLevel();
         e.preventDefault();
         break;
     }
@@ -957,10 +971,10 @@ Message.POS_Y = 400;
 
 
 /* harmony default export */ __webpack_exports__["a"] = ([
-  // level0,
-  // level1,
-  // level2,
-  // level3,
+  __WEBPACK_IMPORTED_MODULE_0__level_0__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_1__level_1__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_2__level_2__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_3__level_3__["a" /* default */],
   __WEBPACK_IMPORTED_MODULE_4__end_game__["a" /* default */]
 ]);
 
@@ -989,7 +1003,7 @@ const messages = [
   "It's HAAAANGRY!!!"
 ];
 
-/* unused harmony default export */ var _unused_webpack_default_export = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls: [],
   height: 200,
   width: 600,
@@ -1030,7 +1044,7 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   radius: 10
 });
 
-/* unused harmony default export */ var _unused_webpack_default_export = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
   height: 300,
   width: 600,
@@ -1066,7 +1080,7 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   radius: 10
 });
 
-/* unused harmony default export */ var _unused_webpack_default_export = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
   height: 200,
   width: 600,
@@ -1107,7 +1121,7 @@ const isGameOver = game => {
   return false;
 };
 
-/* unused harmony default export */ var _unused_webpack_default_export = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls: [],
   height: 300,
   width: 600,
