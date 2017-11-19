@@ -123,7 +123,7 @@ class GameView {
 
   advanceLevel() {
     this.ui.addScore(this.game);
-    this.level += 1;
+    this.level = (this.level + 1) % (__WEBPACK_IMPORTED_MODULE_2__levels_levels__["a" /* default */].length - 1);
     this.createNewLevel();
     this.ui.advanceLevel(this.game);
     this.game.updateMessage();
@@ -355,7 +355,7 @@ class Hole extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */]
     // ctx.fill();
     // ctx.stroke();
 
-    const animationIdx = Math.floor(game.strokes / game.level.par * Hole.animations.length);
+    const animationIdx = Math.ceil(game.strokes / game.level.par * (Hole.animations.length - 1));
     Object.assign(this, Hole.animations[animationIdx]);
 
     // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
@@ -365,10 +365,10 @@ class Hole extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */]
       sy: this.sy,
       sWidth: 64,
       sHeight: 64,
-      dx: dx - 32,
-      dy: dy - 40,
-      dWidth: 64,
-      dHeight: 64
+      dx: dx - 32 * radius / 10,
+      dy: dy - 40 * radius / 10,
+      dWidth: 64 * radius / 10,
+      dHeight: 64 * radius / 10
     };
 
     this.updateAnimation();
@@ -426,13 +426,16 @@ class Game {
   }
 
   addBall() {
-    const ball = new __WEBPACK_IMPORTED_MODULE_0__ball__["a" /* default */]({
-      pos: this.level.ballStartPos,
-      vel: [0, 0],
-      radius: 5
-    });
+    if (this.level.ballStartPos) { // allows for no ball (end game)
+      const ball = new __WEBPACK_IMPORTED_MODULE_0__ball__["a" /* default */]({
+        pos: this.level.ballStartPos,
+        vel: [0, 0],
+        radius: 5
+      });
 
-    this.gameObjects.ball = ball;
+      this.gameObjects.ball = ball;
+    }
+
   }
 
   addPutter(pos = this.level.ballStartPos) {
@@ -467,7 +470,9 @@ class Game {
   }
 
   checkCollissions() {
-    this.gameObjects.ball.checkCollissions(this.level);
+    if (this.gameObjects.ball) {
+      this.gameObjects.ball.checkCollissions(this.level);
+    }
   }
 
   addStroke() {
@@ -605,7 +610,7 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
   }
 
   checkCollissions(level) {
-    level.hole ? this.checkHole(level) : null;
+    if (level.hole) { this.checkHole(level); }
     this.checkLevelBoundaries(level);
     this.checkWalls(level);
   }
@@ -616,7 +621,7 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     const { pos, radius } = this;
     const minimumDistance = holeRadius + radius;
 
-    if (__WEBPACK_IMPORTED_MODULE_0__physics__["a" /* default */].dist(pos, holePos) < minimumDistance){
+    if (__WEBPACK_IMPORTED_MODULE_0__physics__["a" /* default */].dist(pos, holePos) < minimumDistance) {
       this.inHole = true;
     }
   }
@@ -695,36 +700,13 @@ class Putter extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default *
 
   draw(ctx, game) {
     const ball = game.gameObjects.ball;
-    if(!ball.isMoving) {
+    if(ball && !ball.isMoving) {
       const [x, y] = this.pos;
 
-      // const img = new Image();
-      // img.src = "./sprites/crosshair.png";
-      // const dx = 100 * Math.cos(this.theta) + x;
-      // const dy = 100 * Math.sin(this.theta) + y;
-      //
-      // // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
-      // const slice = {
-      //   img,
-      //   sx: 0,
-      //   sy: 0,
-      //   sWidth: 128,
-      //   sHeight: 128,
-      //   dx: dx - 20,
-      //   dy: dy - 32,
-      //   dWidth: 128,
-      //   dHeight: 128
-      // };
-
-      // ctx.drawImage(...Object.values(slice));
-
-      // DEBUG: LINE
       ctx.beginPath();
-      const lineY = 100 * Math.sin(this.theta) + y;
-      const lineX = 100 * Math.cos(this.theta) + x;
-      ctx.moveTo(x, y);
-      ctx.lineTo(lineX, lineY);
+      canvasArrow(ctx, x, y, this.theta);
       ctx.lineWidth = 3;
+      ctx.strokeStyle = "black";
       ctx.stroke();
       ctx.lineWidth = 1;
     }
@@ -732,7 +714,7 @@ class Putter extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default *
 
   move(game) {
     const ball = game.gameObjects.ball;
-    if (!ball.isMoving) {
+    if (ball && !ball.isMoving) {
       this.incrementVel();
       this.pos = game.gameObjects.ball.pos;
     }
@@ -741,7 +723,19 @@ class Putter extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default *
   incrementVel() {
     this.vel = (this.vel + 1) % 120;
   }
+}
 
+// Adapted from source: https://stackoverflow.com/questions/808826/draw-arrow-on-canvas-tag
+function canvasArrow(ctx, fromx, fromy, theta){
+  const toy = 100 * Math.sin(theta) + fromy;
+  const tox = 100 * Math.cos(theta) + fromx;
+  var headlen = 10;   // length of head in pixels
+  ctx.moveTo(fromx, fromy);
+  ctx.lineTo(tox, toy);
+  ctx.moveTo(tox, toy);
+  ctx.lineTo(tox-headlen*Math.cos(theta-Math.PI/6),toy-headlen*Math.sin(theta-Math.PI/6));
+  ctx.moveTo(tox, toy);
+  ctx.lineTo(tox-headlen*Math.cos(theta+Math.PI/6),toy-headlen*Math.sin(theta+Math.PI/6));
 }
 
 /* harmony default export */ __webpack_exports__["a"] = (Putter);
@@ -777,6 +771,7 @@ class UI {
   }
 
   draw(ctx) {
+    ctx.strokeStyle = "black";
     Object.values(this.uiObjects).forEach((obj) => obj.draw(ctx));
   }
 
@@ -964,10 +959,8 @@ Message.POS_Y = 400;
 /* harmony default export */ __webpack_exports__["a"] = ([
   // level0,
   // level1,
-  __WEBPACK_IMPORTED_MODULE_2__level_2__["a" /* default */],
-  __WEBPACK_IMPORTED_MODULE_3__level_3__["a" /* default */],
-
-
+  // level2,
+  // level3,
   __WEBPACK_IMPORTED_MODULE_4__end_game__["a" /* default */]
 ]);
 
@@ -991,9 +984,9 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
 
 const messages = [
   "The monster is hungry. Don't take too long to feed it.",
-  "hungrier...",
+  "It's getting hungrier...",
   "You're tempting fate, my friend.",
-  "HAAAANGRY!!!"
+  "It's HAAAANGRY!!!"
 ];
 
 /* unused harmony default export */ var _unused_webpack_default_export = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
@@ -1002,7 +995,7 @@ const messages = [
   width: 600,
   ballStartPos: [100, 250],
   hole,
-  par: 4,
+  par: 3,
   messages,
   rate: 1.05
 }));
@@ -1026,10 +1019,10 @@ const walls = [
 ];
 
 const messages = [
-  "Message",
-  "Message",
-  "Message",
-  "Message",
+  "This time's a bit harder.",
+  "Don't wait any longer!",
+  "I would run away if I were you.",
+  "It's HAAAANGRY!!",
 ];
 
 const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
@@ -1037,7 +1030,7 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   radius: 10
 });
 
-/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+/* unused harmony default export */ var _unused_webpack_default_export = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
   height: 300,
   width: 600,
@@ -1063,9 +1056,9 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
 
 
 const walls = [
-  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([160, 140, 30, 140]),
-  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([300, 200, 30, 140]),
-  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([440, 140, 30, 140]),
+  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([160, 150, 30, 140]),
+  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([300, 90, 30, 140]),
+  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([440, 150, 30, 140]),
 ];
 
 const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
@@ -1073,7 +1066,7 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   radius: 10
 });
 
-/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+/* unused harmony default export */ var _unused_webpack_default_export = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
   height: 200,
   width: 600,
@@ -1140,33 +1133,25 @@ const isGameOver = game => {
 
 
 
-const walls = [
+const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
+  pos: [350, 250],
+  radius: 40
+});
+
+const messages = [
+  "You made the monster too hungry. Play again?",
 ];
 
-  const messages = [
-    "You made the monster too hungry",
-    "Press space to try again."
-  ];
-
-const isLevelOver = game => {
-  return game.strokes > 7;
-};
-
-const isGameOver = game => {
-  return game.strokes > game.level.par && !game.gameObjects.ball.isMoving;
-};
-
 /* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
-  walls,
-  height: 200,
-  width: 600,
-  ballStartPos: [360, 250],
-  hole: null,
-  par: "∞",
+  walls: [],
+  ballStartPos: null,
+  hole,
+  par: 1,
   messages,
-  isLevelOver,
-  isGameOver,
-  rate: 1.1
+  isLevelOver: () => false,
+  isGameOver: () => false,
+  rate: 1.02,
+  draw: function(ctx, game) { game.strokes = 1; this.hole.draw(ctx, game); }
 }));
 
 
