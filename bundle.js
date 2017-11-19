@@ -121,19 +121,9 @@ class GameView {
     this.level = 0;
 
     this.createNewLevel();
-
     this.ui = new __WEBPACK_IMPORTED_MODULE_1__ui_ui__["a" /* default */](this.game);
     this.game.updateMessage();
     this.start();
-  }
-
-  advanceLevel() {
-    this.ui.addScore(this.game);
-    this.level += 1;
-
-    this.createNewLevel();
-    this.ui.advanceLevel(this.game);
-    this.game.updateMessage();
   }
 
   createNewLevel() {
@@ -142,6 +132,14 @@ class GameView {
       gameView: this
     });
     this.putter = this.game.addPutter();
+  }
+
+  advanceLevel() {
+    this.ui.addScore(this.game);
+    this.level += 1;
+    this.createNewLevel();
+    this.ui.advanceLevel(this.game);
+    this.game.updateMessage();
   }
 
   start() {
@@ -288,13 +286,13 @@ class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */
 
   drawBoundaries(ctx) {
     // center the level boundaries
-    const x =  (__WEBPACK_IMPORTED_MODULE_1__game_view__["a" /* default */].DIM_X - this.width) / 2;
-    const y = (__WEBPACK_IMPORTED_MODULE_1__game_view__["a" /* default */].DIM_Y - this.height) / 2;
+    this.x1 =  (__WEBPACK_IMPORTED_MODULE_1__game_view__["a" /* default */].DIM_X - this.width) / 2;
+    this.y1 = (__WEBPACK_IMPORTED_MODULE_1__game_view__["a" /* default */].DIM_Y - this.height - 100) / 2;
 
     // draw level boundaries
     ctx.beginPath();
     ctx.fillStyle = "#9AE19D";
-    ctx.rect(x, y, this.width, this.height);
+    ctx.rect(this.x1, this.y1, this.width, this.height);
     ctx.fill();
     ctx.strokeStyle = "#2F4858";
     ctx.lineWidth = 10;
@@ -636,8 +634,8 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
     const [x, y] = this.pos;
     const { height, width } = level;
 
-    const x1 = (__WEBPACK_IMPORTED_MODULE_2__game_view__["a" /* default */].DIM_X - width) / 2;
-    const y1 = (__WEBPACK_IMPORTED_MODULE_2__game_view__["a" /* default */].DIM_Y - height) / 2;
+    const x1 = level.x1;
+    const y1 = level.y1;
     const x2 = width + x1;
     const y2 = height + y1;
 
@@ -955,8 +953,8 @@ class Message {
 
 }
 
-Message.POS_X = 50;
-Message.POS_Y = 100;
+Message.POS_X = 60;
+Message.POS_Y = 400;
 
 /* harmony default export */ __webpack_exports__["a"] = (Message);
 
@@ -1000,9 +998,6 @@ Message.POS_Y = 100;
 
 
 
-const walls = [
-];
-
 const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   pos: [600, 250],
   radius: 10
@@ -1016,7 +1011,7 @@ const messages = [
 ];
 
 /* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
-  walls,
+  walls: [],
   height: 200,
   width: 600,
   ballStartPos: [100, 250],
@@ -1112,32 +1107,28 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
 
 
 
-  const walls = [
-  ];
-
   const messages = [
     "Go ahead, press the space bar",
     "Press it again",
-    "Notice your speed.",
-    "It corresponds to the power meter",
+    "Your speed corresponds to the power meter.",
     "Time your hits wisely",
-    "Now move the arrow keys",
+    "Now aim with the arrow keys",
     "That determines your direction",
     "Makes sense?",
-    "Time to feed the monster."
+    "Time to feed the monster..."
   ];
 
 const isLevelOver = game => {
-  return game.strokes > 8;
+  return game.strokes >= messages.length - 1  && !game.gameObjects.ball.isMoving;
 };
 
 const isGameOver = game => {
-  return game.strokes > game.level.par && !game.gameObjects.ball.isMoving;
+  return false;
 };
 
 /* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
-  walls,
-  height: 200,
+  walls: [],
+  height: 300,
   width: 600,
   ballStartPos: [360, 250],
   hole: null,
@@ -1145,7 +1136,7 @@ const isGameOver = game => {
   messages,
   isLevelOver,
   isGameOver,
-  rate: 1.1
+  rate: 1.07
 }));
 
 
