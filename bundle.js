@@ -151,12 +151,11 @@ class GameView {
 
   advanceLevel() {
     this.ui.addScore(this.game);
-    this.level = (this.level + 1) % __WEBPACK_IMPORTED_MODULE_2__levels_levels__["a" /* default */].length;
+    this.level = (this.level + 1); // % (levels.length - 1);
     this.game = new __WEBPACK_IMPORTED_MODULE_0__game_game__["a" /* default */]({
       level: __WEBPACK_IMPORTED_MODULE_2__levels_levels__["a" /* default */][this.level],
       gameView: this
     });
-    this.putter = this.game.addPutter();
     this.ui.advanceLevel(this.game);
     this.game.updateMessage();
   }
@@ -165,7 +164,13 @@ class GameView {
     if (game.level.isLevelOver(game)) {
       this.advanceLevel();
     } else if (game.level.isGameOver(game)) {
-      // game over logic
+      this.level = __WEBPACK_IMPORTED_MODULE_2__levels_levels__["a" /* default */].length - 1;
+      this.game = new __WEBPACK_IMPORTED_MODULE_0__game_game__["a" /* default */]({
+        level: __WEBPACK_IMPORTED_MODULE_2__levels_levels__["a" /* default */][this.level],
+        gameView: this
+      });
+      this.ui.advanceLevel(this.game);
+      this.game.updateMessage();
     }
   }
 
@@ -284,8 +289,11 @@ class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */
   }
 
   drawBoundaries(ctx) {
+    // center the level boundaries
     const x =  (__WEBPACK_IMPORTED_MODULE_1__game_view__["a" /* default */].DIM_X - this.width) / 2;
     const y = (__WEBPACK_IMPORTED_MODULE_1__game_view__["a" /* default */].DIM_Y - this.height) / 2;
+
+    // draw level boundaries
     ctx.beginPath();
     ctx.fillStyle = "#9AE19D";
     ctx.rect(x, y, this.width, this.height);
@@ -426,6 +434,7 @@ class Game {
     this.gameObjects = { level };
     this.strokes = 0;
     this.addBall();
+    this.addPutter();
     this.gameView = gameView;
   }
 
@@ -480,7 +489,7 @@ class Game {
   }
 
   updateMessage() {
-    const message = this.level.messages[this.strokes];
+    const message = this.level.messages ? this.level.messages[this.strokes] : "...";
     this.gameView.displayMessage(message);
   }
 
@@ -963,16 +972,21 @@ Message.POS_Y = 100;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__level_1__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__level_2__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__level_3__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__end_game__ = __webpack_require__(21);
+
 
 
 
 
 
 /* harmony default export */ __webpack_exports__["a"] = ([
-  // level0,
+  __WEBPACK_IMPORTED_MODULE_0__level_0__["a" /* default */],
   __WEBPACK_IMPORTED_MODULE_1__level_1__["a" /* default */],
   __WEBPACK_IMPORTED_MODULE_2__level_2__["a" /* default */],
-  __WEBPACK_IMPORTED_MODULE_3__level_3__["a" /* default */]
+  __WEBPACK_IMPORTED_MODULE_3__level_3__["a" /* default */],
+
+
+  __WEBPACK_IMPORTED_MODULE_4__end_game__["a" /* default */]
 ]);
 
 
@@ -997,7 +1011,7 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
 });
 
 const messages = [
-  "The monster is hungry. Don't take too long.",
+  "The monster is hungry. Don't take too long to feed it.",
   "hungrier...",
   "You're tempting fate, my friend.",
   "HAAAANGRY!!!"
@@ -1042,6 +1056,13 @@ const walls = [
   new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([300, 180, 60, 140])
 ];
 
+const messages = [
+  "Message",
+  "Message",
+  "Message",
+  "Message",
+];
+
 const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   pos: [600, 250],
   radius: 10
@@ -1053,7 +1074,8 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   width: 600,
   ballStartPos: [100, 250],
   hole,
-  par: 3
+  par: 5,
+  messages
 }));
 
 
@@ -1103,8 +1125,8 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
 
 
 
-const walls = [
-];
+  const walls = [
+  ];
 
   const messages = [
     "Go ahead, press the space bar",
@@ -1125,7 +1147,49 @@ const isGameOver = game => {
   return game.strokes > game.level.par && !game.gameObjects.ball.isMoving;
 };
 
-/* unused harmony default export */ var _unused_webpack_default_export = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+  walls,
+  height: 200,
+  width: 600,
+  ballStartPos: [360, 250],
+  hole: null,
+  par: "∞",
+  messages,
+  isLevelOver,
+  isGameOver,
+  rate: 1.1
+}));
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_level__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_wall__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__game_hole__ = __webpack_require__(5);
+
+
+
+
+const walls = [
+];
+
+  const messages = [
+    "You made the monster too hungry",
+    "Press space to try again."
+  ];
+
+const isLevelOver = game => {
+  return game.strokes > 7;
+};
+
+const isGameOver = game => {
+  return game.strokes > game.level.par && !game.gameObjects.ball.isMoving;
+};
+
+/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
   height: 200,
   width: 600,
