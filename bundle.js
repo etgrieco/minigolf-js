@@ -156,13 +156,13 @@ class GameView {
     this.game.step(timeDelta);
     this.game.draw(this.ctx);
     this.ui.draw(this.ctx);
-
     this.lastTime = time;
     requestAnimationFrame(this.animate.bind(this));
   }
 
   checkLevelEnd(game) {
     if (game.level.isLevelOver(game)) {
+      this.sleepTime = 1000;
       this.advanceLevel();
     } else if (game.level.isGameOver(game)) {
       this.level = __WEBPACK_IMPORTED_MODULE_2__levels_levels__["a" /* default */].length - 1;
@@ -226,8 +226,8 @@ class GameView {
   displayMessage(message) {
     this.ui.displayMessage(message);
   }
-
 }
+
 
 GameView.DIM_X = 720;
 GameView.DIM_Y = 480;
@@ -308,7 +308,7 @@ Level.isLevelOver = game => {
 };
 
 Level.isGameOver = game => {
-  return game.strokes > game.level.par && !game.gameObjects.ball.isMoving;
+  return game.strokes >= game.level.par && !game.gameObjects.ball.isMoving;
 };
 
 /* harmony default export */ __webpack_exports__["a"] = (Level);
@@ -828,9 +828,6 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
     ctx.fillText("Hunger:", 40, 460);
 
     //hunger interior
-    // const putter = this.game.gameObjects.putter;
-    // const fill = putter.vel;
-
     const strokes = this.game.strokes;
     const par = this.game.level.par;
     const fill = strokes * (120 / par);
@@ -976,8 +973,8 @@ Message.POS_Y = 400;
 
 
 /* harmony default export */ __webpack_exports__["a"] = ([
-  __WEBPACK_IMPORTED_MODULE_0__level_0__["a" /* default */],
-  __WEBPACK_IMPORTED_MODULE_1__level_1__["a" /* default */],
+  // level0,
+  // level1,
   __WEBPACK_IMPORTED_MODULE_2__level_2__["a" /* default */],
   __WEBPACK_IMPORTED_MODULE_3__level_3__["a" /* default */],
 
@@ -1010,7 +1007,7 @@ const messages = [
   "HAAAANGRY!!!"
 ];
 
-/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+/* unused harmony default export */ var _unused_webpack_default_export = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls: [],
   height: 200,
   width: 600,
@@ -1035,7 +1032,8 @@ const messages = [
 
 
 const walls = [
-  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([300, 180, 60, 140])
+  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([250, 200, 60, 140]),
+  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([400, 40, 60, 140])
 ];
 
 const messages = [
@@ -1052,12 +1050,13 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
 
 /* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
-  height: 200,
+  height: 300,
   width: 600,
   ballStartPos: [100, 250],
   hole,
-  par: 5,
-  messages
+  par: 4,
+  messages,
+  rate: 1.05
 }));
 
 
@@ -1126,7 +1125,7 @@ const isGameOver = game => {
   return false;
 };
 
-/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+/* unused harmony default export */ var _unused_webpack_default_export = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls: [],
   height: 300,
   width: 600,
