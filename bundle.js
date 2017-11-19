@@ -119,18 +119,32 @@ class GameView {
   constructor(ctx) {
     this.ctx = ctx;
     this.level = 0;
+
+    this.createNewLevel();
+
+    this.ui = new __WEBPACK_IMPORTED_MODULE_1__ui_ui__["a" /* default */](this.game);
+    this.game.updateMessage();
+    this.start();
+  }
+
+  advanceLevel() {
+    this.ui.addScore(this.game);
+    this.level += 1;
+
+    this.createNewLevel();
+    this.ui.advanceLevel(this.game);
+    this.game.updateMessage();
+  }
+
+  createNewLevel() {
     this.game = new __WEBPACK_IMPORTED_MODULE_0__game_game__["a" /* default */]({
       level: __WEBPACK_IMPORTED_MODULE_2__levels_levels__["a" /* default */][this.level],
       gameView: this
     });
-    this.ui = new __WEBPACK_IMPORTED_MODULE_1__ui_ui__["a" /* default */](this.game);
-    this.start();
-    this.endGame = false;
-    this.game.updateMessage();
+    this.putter = this.game.addPutter();
   }
 
   start() {
-    this.putter = this.game.addPutter();
     this.bindKeyHandlers();
     this.lastTime = 0;
     window.requestAnimationFrame(this.animate.bind(this));
@@ -149,28 +163,12 @@ class GameView {
     requestAnimationFrame(this.animate.bind(this));
   }
 
-  advanceLevel() {
-    this.ui.addScore(this.game);
-    this.level = (this.level + 1); // % (levels.length - 1);
-    this.game = new __WEBPACK_IMPORTED_MODULE_0__game_game__["a" /* default */]({
-      level: __WEBPACK_IMPORTED_MODULE_2__levels_levels__["a" /* default */][this.level],
-      gameView: this
-    });
-    this.ui.advanceLevel(this.game);
-    this.game.updateMessage();
-  }
-
   checkLevelEnd(game) {
     if (game.level.isLevelOver(game)) {
       this.advanceLevel();
     } else if (game.level.isGameOver(game)) {
       this.level = __WEBPACK_IMPORTED_MODULE_2__levels_levels__["a" /* default */].length - 1;
-      this.game = new __WEBPACK_IMPORTED_MODULE_0__game_game__["a" /* default */]({
-        level: __WEBPACK_IMPORTED_MODULE_2__levels_levels__["a" /* default */][this.level],
-        gameView: this
-      });
-      this.ui.advanceLevel(this.game);
-      this.game.updateMessage();
+      this.createNewLevel();
     }
   }
 
@@ -434,7 +432,6 @@ class Game {
     this.gameObjects = { level };
     this.strokes = 0;
     this.addBall();
-    this.addPutter();
     this.gameView = gameView;
   }
 
@@ -489,7 +486,8 @@ class Game {
   }
 
   updateMessage() {
-    const message = this.level.messages ? this.level.messages[this.strokes] : "...";
+    const message = this.level.messages ?
+      this.level.messages[this.strokes] : "...";
     this.gameView.displayMessage(message);
   }
 
@@ -826,7 +824,7 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
 
   draw(ctx) {
     ctx.beginPath();
-    ctx.font = "30px Roboto";
+    ctx.font = "30px Arial";
     ctx.textAlign = "left";
     ctx.fillStyle = "black";
     ctx.fillText("Hunger:", 40, 460);
@@ -902,7 +900,7 @@ class PowerMeter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* default
 
   draw(ctx) {
     ctx.beginPath();
-    ctx.font = "30px Roboto";
+    ctx.font = "30px Arial";
     ctx.textAlign = "left";
     ctx.fillStyle = "black";
     ctx.fillText("Power:", 450, 460);
@@ -945,7 +943,7 @@ class Message {
   draw(ctx, game) {
     if (this.message) {
       ctx.beginPath();
-      ctx.font = "30px Roboto";
+      ctx.font = "25px Arial";
       ctx.fillStyle = "black";
       ctx.textAlign = "left";
       ctx.fillText(`${this.message}`,
@@ -1017,15 +1015,6 @@ const messages = [
   "HAAAANGRY!!!"
 ];
 
-const isLevelOver = game => {
-  const ball = game.gameObjects.ball;
-  return (ball && ball.inHole);
-};
-
-const isGameOver = game => {
-  return game.strokes > game.level.par && !game.gameObjects.ball.isMoving;
-};
-
 /* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
   height: 200,
@@ -1034,8 +1023,6 @@ const isGameOver = game => {
   hole,
   par: 4,
   messages,
-  isLevelOver,
-  isGameOver,
   rate: 1.05
 }));
 
@@ -1133,14 +1120,15 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
     "Press it again",
     "Notice your speed.",
     "It corresponds to the power meter",
-    "Do you get it yet?",
-    "Move the arrow keys",
+    "Time your hits wisely",
+    "Now move the arrow keys",
     "That determines your direction",
     "Makes sense?",
+    "Time to feed the monster."
   ];
 
 const isLevelOver = game => {
-  return game.strokes > 7;
+  return game.strokes > 8;
 };
 
 const isGameOver = game => {
