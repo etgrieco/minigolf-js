@@ -820,10 +820,26 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
     ctx.font = "30px Roboto";
     ctx.textAlign = "left";
     ctx.fillStyle = "black";
-    ctx.fillText(
-      `Strokes: ${this.game.strokes} / ${this.game.level.par}`,
-        40, 460
-    );
+    ctx.fillText("Hunger:", 40, 460);
+
+    //hunger interior
+    // const putter = this.game.gameObjects.putter;
+    // const fill = putter.vel;
+
+    const strokes = this.game.strokes;
+    const par = this.game.level.par;
+    const fill = strokes * (120 / par);
+
+    ctx.beginPath();
+    ctx.fillStyle = "red";
+    ctx.rect(150, 435, fill, 30);
+    ctx.fill();
+    ctx.stroke();
+
+    //power exterior
+    ctx.beginPath();
+    ctx.rect(150, 435, 120, 30);
+    ctx.stroke();
   }
 
 }
@@ -853,11 +869,11 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
   }
 
   draw(ctx) {
-    ctx.beginPath();
-    ctx.font = "30px Roboto";
-    ctx.fillStyle = "black";
-    ctx.textAlign = "left";
-    ctx.fillText(`Score: ${this.score}`, 280, 460);
+    // ctx.beginPath();
+    // ctx.font = "30px Roboto";
+    // ctx.fillStyle = "black";
+    // ctx.textAlign = "left";
+    // ctx.fillText(`Score: ${this.score}`, 300, 460);
   }
 
 }
@@ -953,7 +969,7 @@ Message.POS_Y = 100;
 
 
 /* harmony default export */ __webpack_exports__["a"] = ([
-  __WEBPACK_IMPORTED_MODULE_0__level_0__["a" /* default */],
+  // level0,
   __WEBPACK_IMPORTED_MODULE_1__level_1__["a" /* default */],
   __WEBPACK_IMPORTED_MODULE_2__level_2__["a" /* default */],
   __WEBPACK_IMPORTED_MODULE_3__level_3__["a" /* default */]
@@ -983,6 +999,7 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
 const messages = [
   "The monster is hungry. Don't take too long.",
   "hungrier...",
+  "You're tempting fate, my friend.",
   "HAAAANGRY!!!"
 ];
 
@@ -1001,10 +1018,11 @@ const isGameOver = game => {
   width: 600,
   ballStartPos: [100, 250],
   hole,
-  par: 2,
+  par: 4,
   messages,
   isLevelOver,
-  isGameOver
+  isGameOver,
+  rate: 1.05
 }));
 
 
@@ -1107,7 +1125,7 @@ const isGameOver = game => {
   return game.strokes > game.level.par && !game.gameObjects.ball.isMoving;
 };
 
-/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+/* unused harmony default export */ var _unused_webpack_default_export = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls,
   height: 200,
   width: 600,
@@ -1117,7 +1135,7 @@ const isGameOver = game => {
   messages,
   isLevelOver,
   isGameOver,
-  rate: 1.05
+  rate: 1.1
 }));
 
 
