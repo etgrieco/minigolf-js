@@ -70,23 +70,10 @@
 "use strict";
 class GameObject {
 
-  constructor() {
+  draw(ctx, game) {}
+  move(ctx) {}
 
-  }
-
-  draw(ctx, game) {
-
-  }
-
-  move(ctx) {
-
-  }
-
-  checkCollissions() {
-
-  }
-
-  update() {
+  updateAnimation() {
     this.currentFrame = this.currentFrame || 0;
     this.counter = this.counter || 0;
     const { counter, frameSpeed, endFrame, currentFrame } = this;
@@ -274,9 +261,9 @@ class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */
     this.isGameOver = this.isGameOver || Level.isGameOver;
   }
 
-  draw(ctx) {
+  draw(ctx, game) {
     this.drawBoundaries(ctx);
-    this.hole ? this.hole.draw(ctx) : null; // allows for holeless levels
+    this.hole ? this.hole.draw(ctx, game) : null; // allows for holeless levels
     this.drawWalls(ctx);
   }
 
@@ -354,20 +341,13 @@ class Hole extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */]
   constructor(props) {
     super();
     Object.assign(this, props);
-
-    //Animation variables
-    this.endFrame = 4;
-    this.frameSpeed = 10;
   }
 
-  draw(ctx) {
+  draw(ctx, game) {
     const { radius, pos } = this;
     const [dx, dy] = pos;
-
     const img = new Image();
-    img.src = "./sprites/hole.png";
-
-    this.update();
+    img.src = "./sprites/hole_reverse.png";
 
     // DEBUG: VIEW CIRCLE POSITION
     // ctx.beginPath();
@@ -375,11 +355,14 @@ class Hole extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */]
     // ctx.fill();
     // ctx.stroke();
 
+    const animationIdx = Math.floor(game.strokes / game.level.par * Hole.animations.length);
+    Object.assign(this, Hole.animations[animationIdx]);
+
     // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
-    const slice = {
+    const props = {
       img,
-      sx: 64 * this.currentFrame,
-      sy: 128,
+      sx: 448 - (64 * this.currentFrame),
+      sy: this.sy,
       sWidth: 64,
       sHeight: 64,
       dx: dx - 32,
@@ -388,10 +371,25 @@ class Hole extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */]
       dHeight: 64
     };
 
-    ctx.drawImage(...Object.values(slice));
+    this.updateAnimation();
+    ctx.drawImage(...Object.values(props));
   }
 
 }
+
+// dy: number of frames
+Hole.animations = [
+    {endFrame: 4, sy: 0, frameSpeed: 10},
+    {endFrame: 5, sy: 64, frameSpeed: 10},
+    {endFrame: 5, sy: 64, frameSpeed: 5},
+    {endFrame: 6, sy: 128, frameSpeed: 5},
+  ];
+// 0: 4,
+// 1: 5,
+// 2: 6,
+// 3: 7,
+// 4: 0,
+// 5: 8,
 
 /* harmony default export */ __webpack_exports__["a"] = (Hole);
 
