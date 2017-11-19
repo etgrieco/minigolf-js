@@ -384,12 +384,6 @@ Hole.animations = [
     {endFrame: 5, sy: 64, frameSpeed: 5},
     {endFrame: 6, sy: 128, frameSpeed: 5},
   ];
-// 0: 4,
-// 1: 5,
-// 2: 6,
-// 3: 7,
-// 4: 0,
-// 5: 8,
 
 /* harmony default export */ __webpack_exports__["a"] = (Hole);
 
@@ -564,7 +558,6 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
       this.decellerate(vx, vy, game.level.rate);
       this.translate(vx, vy, delta);
     }
-
   }
 
   decellerate(vx, vy, rate) {
@@ -589,7 +582,7 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
   hit(putter) {
     const audio = new Audio(`./audio/hit_${Math.floor(Math.random() * 4 + 1)}.wav`);
     audio.play();
-    let { vel, theta } = putter;
+    const { vel, theta } = putter;
     const vx = vel / 8 * Math.cos(theta);
     const vy = vel / 8 * Math.sin(theta);
 
@@ -630,10 +623,8 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
 
   checkLevelBoundaries(level) {
     const [x, y] = this.pos;
-    const { height, width } = level;
+    const { x1, y1, height, width } = level;
 
-    const x1 = level.x1;
-    const y1 = level.y1;
     const x2 = width + x1;
     const y2 = height + y1;
 
@@ -645,11 +636,11 @@ class Ball extends __WEBPACK_IMPORTED_MODULE_1__game_object__["a" /* default */]
   checkWalls(level) {
     const [x, y] = this.pos;
     for (let i = 0; i < level.walls.length; i++) {
-      let wall = level.walls[i];
-      let [x1, y1, width, height] = wall.dimensions;
+      const wall = level.walls[i];
+      const [x1, y1, width, height] = wall.dimensions;
 
-      let x2 = width + x1;
-      let y2 = height + y1;
+      const x2 = width + x1;
+      const y2 = height + y1;
 
       if ((y >= y1 && y <= y2) && (x >= x1 && x <= x2)) {
         this.inObstacle = true;
