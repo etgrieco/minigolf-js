@@ -388,6 +388,7 @@ class GameView {
       case "R":
         this.level = 0;
         this.advanceLevel();
+        this.ui.resetScore();
         break;
     }
   }
@@ -815,6 +816,10 @@ class UI {
     this.uiObjects.message.displayMessage();
   }
 
+  resetScore() {
+    this.uiObjects.score.resetScore();
+  }
+
 }
 
 /* harmony default export */ __webpack_exports__["a"] = (UI);
@@ -874,18 +879,22 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
     this.score = 0;
   }
 
+  resetScore() {
+    this.score = 0;
+  }
+
   addScore(game) {
     if ((Number(game.level.par))) {
-      this.score += (game.level.par - game.strokes) * 100;
+      this.score += (game.level.par + 1 - game.strokes) * 100;
     }
   }
 
   draw(ctx) {
-    // ctx.beginPath();
-    // ctx.font = "30px Roboto";
-    // ctx.fillStyle = "black";
-    // ctx.textAlign = "left";
-    // ctx.fillText(`Score: ${this.score}`, 300, 460);
+    ctx.beginPath();
+    ctx.font = "25px Roboto";
+    ctx.fillStyle = "black";
+    ctx.textAlign = "left";
+    ctx.fillText(`Score: ${this.score}`, 290, 460);
   }
 
 }
@@ -946,7 +955,6 @@ class Message extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* default */
 
   displayMessage() {
     this.message = this.game.level.getMessage(this.game.strokes);
-    console.log(this.message);
   }
 
   draw(ctx, game) {
