@@ -94,6 +94,185 @@ class GameObject {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_object__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_view__ = __webpack_require__(5);
+
+
+
+class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */] {
+
+  constructor(props) {
+    super();
+    Object.assign(this, props);
+    this.isLevelOver = this.isLevelOver || Level.isLevelOver;
+    this.isGameOver = this.isGameOver || Level.isGameOver;
+    this.getMessage = this.getMessage || Level.getMessage;
+  }
+
+  draw(ctx, game) {
+    this.drawBoundaries(ctx);
+    this.hole ? this.hole.draw(ctx, game) : null; // allows for holeless levels
+    this.drawWalls(ctx);
+  }
+
+  drawWalls(ctx) {
+    this.walls.forEach((wall) => wall.draw(ctx));
+  }
+
+  drawBoundaries(ctx) {
+    // center the level boundaries
+    this.x1 =  (__WEBPACK_IMPORTED_MODULE_1__game_view__["a" /* default */].DIM_X - this.width) / 2;
+    this.y1 = (__WEBPACK_IMPORTED_MODULE_1__game_view__["a" /* default */].DIM_Y - this.height - 100) / 2;
+
+    // draw level boundaries
+    ctx.beginPath();
+    ctx.fillStyle = "#9AE19D";
+    ctx.rect(this.x1, this.y1, this.width, this.height);
+    ctx.fill();
+    ctx.strokeStyle = "#2F4858";
+    ctx.lineWidth = 10;
+    ctx.stroke();
+    ctx.lineWidth = 1;
+  }
+
+}
+
+Level.messages = [
+  "The monster is hungry.",
+  "It's getting hungrier...",
+  "You're tempting fate, my friend.",
+  "It's HAAAANGRY!!!",
+  "You've got nothing to lose... but your arm.",
+  "Don't wait any longer!",
+  "I would run away if I were you."
+];
+
+Level.getMessage = strokes => (
+  Level.messages[Math.floor(Math.random() * Level.messages.length)]
+);
+
+Level.isLevelOver = game => {
+  const ball = game.gameObjects.ball;
+  return (ball && ball.inHole);
+};
+
+Level.isGameOver = game => {
+  return game.strokes >= game.level.par && !game.gameObjects.ball.isMoving;
+};
+
+/* harmony default export */ __webpack_exports__["a"] = (Level);
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_object__ = __webpack_require__(0);
+
+
+class Wall extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */] {
+
+  constructor(dimensions) {
+    super();
+    this.dimensions = dimensions; // array of dimensions
+  }
+
+  draw(ctx) {
+    ctx.beginPath();
+    ctx.rect(...this.dimensions);
+    ctx.fillStyle = "#2F4858";
+    ctx.fill();
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (Wall);
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_object__ = __webpack_require__(0);
+
+
+class Hole extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */] {
+
+  constructor(props) {
+    super();
+    Object.assign(this, props);
+  }
+
+  draw(ctx, game) {
+    const { radius, pos } = this;
+    const [dx, dy] = pos;
+    const img = new Image();
+    img.src = "./sprites/hole_reverse.png";
+
+    // DEBUG: VIEW CIRCLE POSITION
+    // ctx.beginPath();
+    // ctx.arc(dx, dy, radius, 0, 2 * Math.PI);
+    // ctx.fill();
+    // ctx.stroke();
+
+    const animationIdx = Math.ceil(game.strokes / game.level.par * (Hole.animations.length - 1));
+    Object.assign(this, Hole.animations[animationIdx]);
+
+    // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+    const props = {
+      img,
+      sx: 448 - (64 * this.currentFrame),
+      sy: this.sy,
+      sWidth: 64,
+      sHeight: 64,
+      dx: dx - 32 * radius / 10,
+      dy: dy - 40 * radius / 10,
+      dWidth: 64 * radius / 10,
+      dHeight: 64 * radius / 10
+    };
+
+    this.updateAnimation();
+    ctx.drawImage(...Object.values(props));
+  }
+
+}
+
+// dy: number of frames
+Hole.animations = [
+    {endFrame: 4, sy: 0, frameSpeed: 10},
+    {endFrame: 5, sy: 64, frameSpeed: 10},
+    {endFrame: 5, sy: 64, frameSpeed: 5},
+    {endFrame: 6, sy: 128, frameSpeed: 5},
+  ];
+
+/* harmony default export */ __webpack_exports__["a"] = (Hole);
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+class UIObject {
+
+  constructor(game) {
+    this.game = game;
+  }
+
+  draw() {}
+
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (UIObject);
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_game__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__ui_ui__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__levels_levels__ = __webpack_require__(16);
@@ -127,7 +306,7 @@ class GameView {
     if (this.level < 1) { this.level++; }
     this.createNewLevel();
     this.ui.advanceLevel(this.game);
-    this.game.updateMessage();
+    this.displayMessage();
   }
 
   start() {
@@ -155,7 +334,8 @@ class GameView {
     } else if (game.level.isGameOver(game)) {
       this.level = __WEBPACK_IMPORTED_MODULE_2__levels_levels__["a" /* default */].length - 1;
       this.createNewLevel();
-      this.game.updateMessage();
+      this.ui.advanceLevel(this.game);
+      this.displayMessage();
     }
   }
 
@@ -236,191 +416,12 @@ GameView.DIM_Y = 480;
 
 
 /***/ }),
-/* 2 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-class UIObject {
-
-  constructor(game) {
-    this.game = game;
-  }
-
-  draw() {}
-
-}
-
-/* harmony default export */ __webpack_exports__["a"] = (UIObject);
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_object__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_view__ = __webpack_require__(1);
-
-
-
-class Level extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */] {
-
-  constructor(props) {
-    super();
-    Object.assign(this, props);
-    this.isLevelOver = this.isLevelOver || Level.isLevelOver;
-    this.isGameOver = this.isGameOver || Level.isGameOver;
-    this.getMessage = this.getMessage || Level.getMessage;
-  }
-
-  draw(ctx, game) {
-    this.drawBoundaries(ctx);
-    this.hole ? this.hole.draw(ctx, game) : null; // allows for holeless levels
-    this.drawWalls(ctx);
-  }
-
-  drawWalls(ctx) {
-    this.walls.forEach((wall) => wall.draw(ctx));
-  }
-
-  drawBoundaries(ctx) {
-    // center the level boundaries
-    this.x1 =  (__WEBPACK_IMPORTED_MODULE_1__game_view__["a" /* default */].DIM_X - this.width) / 2;
-    this.y1 = (__WEBPACK_IMPORTED_MODULE_1__game_view__["a" /* default */].DIM_Y - this.height - 100) / 2;
-
-    // draw level boundaries
-    ctx.beginPath();
-    ctx.fillStyle = "#9AE19D";
-    ctx.rect(this.x1, this.y1, this.width, this.height);
-    ctx.fill();
-    ctx.strokeStyle = "#2F4858";
-    ctx.lineWidth = 10;
-    ctx.stroke();
-    ctx.lineWidth = 1;
-  }
-
-}
-
-Level.messages = [
-  "The monster is hungry.",
-  "It's getting hungrier...",
-  "You're tempting fate, my friend.",
-  "It's HAAAANGRY!!!",
-  "This time's a bit harder.",
-  "Don't wait any longer!",
-  "I would run away if I were you."
-];
-
-Level.getMessage = strokes => (
-  Level.messages[Math.floor(Math.random() * Level.messages.length)]
-);
-
-Level.isLevelOver = game => {
-  const ball = game.gameObjects.ball;
-  return (ball && ball.inHole);
-};
-
-Level.isGameOver = game => {
-  return game.strokes >= game.level.par && !game.gameObjects.ball.isMoving;
-};
-
-/* harmony default export */ __webpack_exports__["a"] = (Level);
-
-
-/***/ }),
-/* 4 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_object__ = __webpack_require__(0);
-
-
-class Wall extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */] {
-
-  constructor(dimensions) {
-    super();
-    this.dimensions = dimensions; // array of dimensions
-  }
-
-  draw(ctx) {
-    ctx.beginPath();
-    ctx.rect(...this.dimensions);
-    ctx.fillStyle = "#2F4858";
-    ctx.fill();
-  }
-
-}
-
-/* harmony default export */ __webpack_exports__["a"] = (Wall);
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_object__ = __webpack_require__(0);
-
-
-class Hole extends __WEBPACK_IMPORTED_MODULE_0__game_object__["a" /* default */] {
-
-  constructor(props) {
-    super();
-    Object.assign(this, props);
-  }
-
-  draw(ctx, game) {
-    const { radius, pos } = this;
-    const [dx, dy] = pos;
-    const img = new Image();
-    img.src = "./sprites/hole_reverse.png";
-
-    // DEBUG: VIEW CIRCLE POSITION
-    // ctx.beginPath();
-    // ctx.arc(dx, dy, radius, 0, 2 * Math.PI);
-    // ctx.fill();
-    // ctx.stroke();
-
-    const animationIdx = Math.ceil(game.strokes / game.level.par * (Hole.animations.length - 1));
-    Object.assign(this, Hole.animations[animationIdx]);
-
-    // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
-    const props = {
-      img,
-      sx: 448 - (64 * this.currentFrame),
-      sy: this.sy,
-      sWidth: 64,
-      sHeight: 64,
-      dx: dx - 32 * radius / 10,
-      dy: dy - 40 * radius / 10,
-      dWidth: 64 * radius / 10,
-      dHeight: 64 * radius / 10
-    };
-
-    this.updateAnimation();
-    ctx.drawImage(...Object.values(props));
-  }
-
-}
-
-// dy: number of frames
-Hole.animations = [
-    {endFrame: 4, sy: 0, frameSpeed: 10},
-    {endFrame: 5, sy: 64, frameSpeed: 10},
-    {endFrame: 5, sy: 64, frameSpeed: 5},
-    {endFrame: 6, sy: 128, frameSpeed: 5},
-  ];
-
-/* harmony default export */ __webpack_exports__["a"] = (Hole);
-
-
-/***/ }),
 /* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_game_view__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_game_view__ = __webpack_require__(5);
 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -527,7 +528,7 @@ class Game {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__physics__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_object__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__game_view__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__game_view__ = __webpack_require__(5);
 
 
 
@@ -824,7 +825,7 @@ class UI {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ui_object__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ui_object__ = __webpack_require__(4);
 
 
 class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* default */] {
@@ -863,7 +864,7 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ui_object__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ui_object__ = __webpack_require__(4);
 
 
 class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* default */] {
@@ -897,7 +898,7 @@ class StrokeCounter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* defa
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ui_object__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ui_object__ = __webpack_require__(4);
 
 
 class PowerMeter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* default */] {
@@ -934,7 +935,7 @@ class PowerMeter extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* default
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ui_object__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__ui_object__ = __webpack_require__(4);
 
 
 class Message extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* default */] {
@@ -945,6 +946,7 @@ class Message extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* default */
 
   displayMessage() {
     this.message = this.game.level.getMessage(this.game.strokes);
+    console.log(this.message);
   }
 
   draw(ctx, game) {
@@ -959,7 +961,7 @@ class Message extends __WEBPACK_IMPORTED_MODULE_0__ui_object__["a" /* default */
       );
     }
   }
-  
+
 }
 
 Message.POS_X = 60;
@@ -973,10 +975,10 @@ Message.POS_Y = 400;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__level_0__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__level_1__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__level_2__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__level_3__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__level_0__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__level_1__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__level_2__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__level_3__ = __webpack_require__(20);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__end_game__ = __webpack_require__(21);
 
 
@@ -998,111 +1000,17 @@ Message.POS_Y = 400;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_level__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_wall__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__game_hole__ = __webpack_require__(5);
-
-
-
-
-const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
-  pos: [600, 250],
-  radius: 10
-});
-
-/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
-  walls: [],
-  height: 200,
-  width: 600,
-  ballStartPos: [100, 250],
-  hole,
-  par: 3,
-  rate: 1.05
-}));
-
-
-/***/ }),
-/* 18 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_level__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_wall__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__game_hole__ = __webpack_require__(5);
-
-
-
-
-const walls = [
-  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([250, 200, 60, 140]),
-  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([400, 40, 60, 140])
-];
-
-const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
-  pos: [600, 250],
-  radius: 10
-});
-
-/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
-  walls,
-  height: 300,
-  width: 600,
-  ballStartPos: [100, 250],
-  hole,
-  par: 4,
-  rate: 1.05
-}));
-
-
-/***/ }),
-/* 19 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_level__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_wall__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__game_hole__ = __webpack_require__(5);
-
-
-
-
-const walls = [
-  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([160, 150, 30, 140]),
-  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([300, 90, 30, 140]),
-  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([440, 150, 30, 140]),
-];
-
-const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
-  pos: [600, 250],
-  radius: 10
-});
-
-/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
-  walls,
-  height: 200,
-  width: 600,
-  ballStartPos: [100, 250],
-  hole,
-  par: 4
-}));
-
-
-/***/ }),
-/* 20 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_level__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_wall__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__game_hole__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_level__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_wall__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__game_hole__ = __webpack_require__(3);
 
 
 
 
   const messages = [
-    "Go ahead, press the space bar",
+    "Go ahead, press the space bar (R: skip tutorial)",
     "Press it again",
-    "Your speed corresponds to the power meter.",
+    "Your speed corresponds to the power meter.        ⬇",
     "Time your hits wisely",
     "Now aim with the arrow keys",
     "That determines your direction",
@@ -1133,13 +1041,114 @@ const isGameOver = game => {
 
 
 /***/ }),
+/* 18 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_level__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_wall__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__game_hole__ = __webpack_require__(3);
+
+
+
+
+const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
+  pos: [600, 250],
+  radius: 10
+});
+
+const messages = [
+  "⬇ The monster is hungry.",
+  "⬇ Don't let the meter fill!",
+  "⬇ You'll be sorry..."
+];
+
+/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+  walls: [],
+  height: 200,
+  width: 600,
+  ballStartPos: [100, 250],
+  hole,
+  par: 3,
+  rate: 1.05,
+  getMessage: (strokes) => messages[strokes],
+}));
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_level__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_wall__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__game_hole__ = __webpack_require__(3);
+
+
+
+
+const walls = [
+  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([250, 200, 60, 140]),
+  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([400, 40, 60, 140])
+];
+
+const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
+  pos: [600, 250],
+  radius: 10
+});
+
+/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+  walls,
+  height: 300,
+  width: 600,
+  ballStartPos: [100, 250],
+  hole,
+  par: 4,
+  rate: 1.05
+}));
+
+
+/***/ }),
+/* 20 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_level__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_wall__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__game_hole__ = __webpack_require__(3);
+
+
+
+
+const walls = [
+  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([160, 150, 30, 140]),
+  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([300, 90, 30, 140]),
+  new __WEBPACK_IMPORTED_MODULE_1__game_wall__["a" /* default */]([440, 150, 30, 140]),
+];
+
+const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
+  pos: [600, 250],
+  radius: 10
+});
+
+/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
+  walls,
+  height: 200,
+  width: 600,
+  ballStartPos: [100, 250],
+  hole,
+  par: 4
+}));
+
+
+/***/ }),
 /* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_level__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_wall__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__game_hole__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__game_level__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__game_wall__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__game_hole__ = __webpack_require__(3);
 
 
 
@@ -1149,18 +1158,14 @@ const hole = new __WEBPACK_IMPORTED_MODULE_2__game_hole__["a" /* default */]({
   radius: 40
 });
 
-const messages = [
-  "You made the monster too hungry. Play again? (Press \"R\")",
-];
-
 /* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls: [],
   ballStartPos: null,
   hole,
   par: 1,
-  messages,
   isLevelOver: () => false,
   isGameOver: () => false,
+  getMessage: () => "The monster got to hungry. Play again? (Press 'r')",
   rate: 1.02,
   draw: function(ctx, game) { game.strokes = 1; this.hole.draw(ctx, game); }
 }));
