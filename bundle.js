@@ -352,32 +352,29 @@ class GameView {
 
   changeTheta(e) {
     const modifier = e.shiftKey ? .3 : 1;
+    e.preventDefault();
     switch (e.key) {
       case "s":
       case "S":
       case "ArrowDown":
         this.putter.theta += this.putter.thetaDirection * .2 * modifier;
-        e.preventDefault();
         break;
       case "w":
       case "W":
       case "ArrowUp":
         this.putter.theta -= this.putter.thetaDirection * .2 * modifier;
-        e.preventDefault();
         break;
       case "a":
       case "A":
       case "ArrowLeft":
         this.putter.theta = Math.PI;
         this.putter.thetaDirection = -1;
-        e.preventDefault();
         break;
       case "d":
       case "D":
       case "ArrowRight":
         this.putter.thetaDirection = 1;
         this.putter.theta = 0;
-        e.preventDefault();
         break;
     }
   }
@@ -394,12 +391,12 @@ class GameView {
   }
 
   changeVelocity(e) {
+    e.preventDefault();
     switch (e.key) {
       case " ":
         if (this.game.hit()) {
           this.game.addStroke();
         }
-        e.preventDefault();
         break;
     }
   }
@@ -1030,10 +1027,6 @@ const isLevelOver = game => (
   game.strokes >= messages.length - 1 && !game.gameObjects.ball.isMoving
 );
 
-const isGameOver = game => {
-  return false;
-};
-
 /* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0__game_level__["a" /* default */] ({
   walls: [],
   height: 300,
@@ -1041,9 +1034,10 @@ const isGameOver = game => {
   ballStartPos: [360, 250],
   hole: null,
   par: "∞",
-  getMessage: (strokes) => messages[strokes],
-  isLevelOver,
-  isGameOver,
+  getMessage: strokes => messages[strokes],
+  isLevelOver: game => game.strokes >= messages.length - 1 &&
+                       !game.gameObjects.ball.isMoving,
+  isGameOver: () => false,
   rate: 1.07
 }));
 

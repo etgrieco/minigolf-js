@@ -1,74 +1,87 @@
-# JS Project Proposal: Mini-golf Game
+# MonsterGolfJS - A minigolf game made in Javascript + Canvas
 
-### Background
+## The premise
 
-Golf games are a popular and simple sports/arcade genre that has an intuitive design, since many people are familiar with this recreational activity. Generally, these games follow a similar format:
-* The gameplay is played from the top-down/birds-eye perspective
-* Players can control the angle of the shot they make.
-* Players can control the initial velocity ("Power") of the shot they make.
+We all have likely experienced the emotion of "Hanger" -- when one gets so hungry that your emotions turn upside-down. The theme of this game was built on this premise -- the monster is hangry, and it is your duty to feed it as fast as possible!
 
-The specific implementation of this game will be outliened in the below sections.
+## Features
 
-### Functionality & MVP
-This minigolf game will be able to:
-- [ ] Take the user input to control the angle and power of the shot.
-- [ ] Incorporate a skill-based element for the power meter that will force the player to properly time their inputs to adjust for shot power appropriately
-- [ ] A consistent physics model that allows shots to be relatively predictable
-- [ ] Include a set number (3 - 5) of pleasing level designs of increasing difficulty
-- [ ] Utilize pleasing graphics to represent a real-world visual approximation of the actual game, to draw players in.
+### "Ball" physics
 
-The project will also include:
-- [ ] An About modal describing the background and rules of the game
-- [ ] A production README
+This game implements a simple physics engine to emulate a realistic ricochet effect. This was implemented using a simple yet elegant algorithm to check for bounce direction:
 
-### Wireframes
+```Javascript
+//ball.js: Richochet logic; run if ball is "in" an obstacle
+Ball.prototype.ricochet = function(vx, vy, level) {
+  const testBall = new Ball({ pos: [this.pos[0] - vx, this.pos[1]] });
 
-This app will use a simple GUI in order to display important information for gameplay, including score (relative to par), the power level of shots, and a visual indicator for player's intended shot path.
+  // if reversal of x-direction does not remove from obstacle,
+  // then reverse the y-direction speed
+  testBall.checkCollissions(level);
+  this.vel = testBall.inObstacle ? [vx, -vy] : [-vx, vy];
 
-![Wireframe](https://raw.githubusercontent.com/etgrieco/minigolf-js/master/docs/images/wireframe.png)
+  this.inObstacle = false;
+}
+```
 
-The color scheme of the game should clearly indicate the presence of the ball, hole, and obstacles.
+### Object-oriented ES6: Animation and Object Coordination
 
-### Technologies
-`JavaScript` for game logic
-`HTML Canvas` for rendering of gamespace.
-`Webpack` for bundling the js files
+One of the strengths of this Javascript project is its strong adherence to Object oriented programming conventions, especially taking advantage of ES6 syntactic sugar for prototypal inheritance for coding and reading ease. The component objects are arranged in a logical hierarchy to allow for predictable object APIs and DRY, readable code.
 
-The primary scripts that will hold the game-logic will be broken up into: 
+The `GameView`
+ * Contains: `Game` & `UI`
+ * Responsible for starting the game
+ * Controls key bindings for interaction with game
+ * Keeps track of level advancement and level number
+ * Every frame...
+  * Checks for end level (monster eats food) or end game (monster too hungry) conditions
+  * Draws the `UI`
+  * Draws `Game`
 
-`{game_object}.js`: These files how different game objects (ball, hole, walls, etc.) will interact with the physics engine in the former file. All game objects will inherit from `GameObjects`, to keep the code DRY and simplify rendering methods.
+The `Game`
+* Contains: Game Objects
+* Game objects are capable of animation routines, being moved on the canvas, and being drawn
+* Game Objects is a parent of...
+  * `Ball`
+  * `Putter`
+  * `Level`
+    * `Hole`: The monster and its animation routines
+    * `Wall`s (contained in levels)
+* Every frame...
+  * Triggers collision detections between `Ball` and other objects
+  * Moves game objects
+  * Draws all game objects in their current state
+  * Tells the game view to update the UI's messages
+* Also keeps track of a level's strokes when a ball is hit.
 
-`physics.js`: This will handle the majority of important physics calculations, such as collision-detection.
+The `UI`...
+* Contains: UI Objects (stores and instance of game to access game-relevant variables)
+* UI Objects are drawn every frame
+* UI Objects is a parent of...
+  * `Message`: In-game messages that update on every stroke
+  * `PowerMeter`: Updates every frame
+  * `ScoreCounter`: Updates on a level change
+  * `StrokeCounter`: Updates every stroke
 
-`level_{x}.js`: Once the general game logic works, level objects can build the game world, with properties that designate the placement and attributes of the available `game_objects`.
+The `Level`...
+* Contains: Wall Objects, message methods, and the `Hole` (monster position)
+* Keeps track of other basic properties as well, such as par & movement rate (for variable friction)
+* Utilizes standard methods for most levels, but many methods are overwritable for 'special' level scenarios, such as the tutorial level and end-game, which lack a traditional par. These flexible level elements allowed for a consistent object to be used throughout the game without too many explicit deviations in the game logic:
 
-`game.js`: This file combines the various game objects into a single API. It is responsible for the master `draw` and `move` functions, which calls the corresponding `draw`/`move` functions of all the game objects, populated by a level design, it contains.
+Here's an example of the level's unique object architecture, taking advantage of the OOP flexibility in Javascript. While this approach 'breaks' some OOP conventions, it allows for a clean implementation of advancing through levels in the overall game logic.
 
-`game_view.js`: Handles user input and the HTML canvas context. This should also include the basic sounds needed for an immersive game experience.
+```Javascript
+class Level extends GameObject {
 
-### Implementation Timelinez
+  constructor(props) {
+    super();
+    Object.assign(this, props); // takes many variable properties
 
-**Day 1:** Write an entry file that can load an object oriented library of javascript files utilizing ES6 import/export functionality. Learn `Canvas` basics and choose the specific tools that would be best for my project. Draft 3-5 basic level designs.
+    // End-game, End-level, and messaging functions are re-assignable for special scenarios
+    this.isLevelOver = this.isLevelOver || Level.isLevelOver;
+    this.isGameOver = this.isGameOver || Level.isGameOver;
+    this.getMessage = this.getMessage || Level.getMessage;
+  }
+```
 
-Goals:
-* Get a green entry-file/bundle working
-* Level design rough drafts
-
-**Day 2:** Dedicate the day to getting a working physics prototype working. The model should be able to take simplified payer input to determine the angle of the shot, and a simple UI with basic `canvas` elements to demonstrate the physics model in practice.
-* Complete a working prototype of the golf physics model, including:
-  * Variable initial-velocities
-  * Consistent deceleration
-  * Collision
-  * Momentum-transfer (richochet) effects
-* Design allows for future user input.
-  
-**Day 3:** Incorporate user-input into the game, including a timing-aspect for the power-meter. Build level designs and get at least 1 hole working.
-
-**Day 4:** Style the level assets, and use these styled assets to make at least two more levels.
-* Professionally-styled UI for input and control directions. Use visual effects to demonstrate intended gameplay appropriately.
-* Build at least 2 more levels using the asset-builder: if everything is in place, putting a new level together should be easy!
-
-### Bonus Features
-
-- [ ] More levels
-- [ ] Advanced obstacle types: moving obstacles, for example.
+```Javascript
