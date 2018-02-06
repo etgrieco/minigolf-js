@@ -1,5 +1,7 @@
 # MonsterGolfJS - A minigolf game made in Javascript + Canvas
 
+[Live Game](http://websiteaboutmy.website/minigolf-js/)
+
 ## The premise
 
 We all have likely experienced the emotion of "Hanger" -- when one gets so hungry that your emotions turn upside-down. The theme of this game was built on this premise -- the monster is hangry, and it is your duty to feed it as fast as possible!
