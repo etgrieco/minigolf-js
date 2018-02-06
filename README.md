@@ -74,9 +74,10 @@ Here's an example of the level's unique object architecture, taking advantage of
 class Level extends GameObject {
 
   constructor(props) {
-    super();
-    Object.assign(this, props); // takes many variable properties
-
+    super(
+     Object.assign(this, props); // takes many variable properties
+    );
+    
     // End-game, End-level, and messaging functions are re-assignable for special scenarios
     this.isLevelOver = this.isLevelOver || Level.isLevelOver;
     this.isGameOver = this.isGameOver || Level.isGameOver;
